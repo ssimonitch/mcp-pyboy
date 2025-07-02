@@ -4,19 +4,43 @@
 
 MCP server for Game Boy emulation via PyBoy, designed for LLM interaction.
 
+## Development Environment
+
+This project uses **uv** for fast Python dependency management.
+
+### Setup Commands
+
+```bash
+# Install all dependencies (creates .venv automatically)
+uv sync
+
+# Install with development dependencies
+uv sync --extra dev
+
+# Run commands in virtual environment
+uv run <command>
+
+# Activate virtual environment manually (optional)
+source .venv/bin/activate
+```
+
 ## Key Conventions
 
 - All async functions use type hints
 - Docstrings follow Google style
 - Error messages include recovery suggestions
 - Tests use pytest with async support
+- Python 3.10+ required
 
 ## Common Tasks
 
-- Run tests: `pytest tests/ -v`
-- Format code: `black src/ tests/`
-- Type check: `mypy src/`
-- Start server: `python -m mcp_pyboy.server`
+- Run tests: `uv run pytest tests/ -v`
+- Format code: `uv run black src/ tests/`
+- Type check: `uv run mypy src/`
+- Lint code: `uv run ruff check src/ tests/`
+- Start server: `uv run python -m mcp_pyboy.server`
+- Install new dependency: `uv add <package-name>`
+- Install dev dependency: `uv add --dev <package-name>`
 
 ## Architecture Notes
 

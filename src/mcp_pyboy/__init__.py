@@ -9,12 +9,13 @@ __version__ = "0.1.0"
 __author__ = "Your Name"
 __email__ = "your.email@example.com"
 
-from .mcp_server.server import MCPServer
-from .game_session.manager import GameSessionManager
-from .notebook.notebook import NotebookManager
+# Imports will be added as modules are implemented
+# from .mcp_server.server import MCPServer
+# from .game_session.manager import GameSessionManager  
+# from .notebook.notebook import NotebookManager
 
 __all__ = [
-    "MCPServer",
-    "GameSessionManager", 
-    "NotebookManager",
+    "__version__",
+    "__author__",
+    "__email__",
 ]
