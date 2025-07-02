@@ -6,13 +6,15 @@ This document provides a step-by-step implementation guide for building the MCP 
 
 ## Progress Tracking
 
-- **Total Tasks**: 47
+- **Total Tasks**: 45
 - **Estimated Time**: 2-3 weeks (solo developer)
-- **Current Progress**: 2/47 completed
+- **Current Progress**: 2/45 completed
 
 ---
 
 ## Phase 1: Project Foundation (Days 1-2)
+
+*Updated: Consolidated overlapping tasks 1.4 and 1.5 into streamlined workflow. VS Code configuration completed.*
 
 ### Project Setup
 - [x] **1.1** Create Python project structure
@@ -28,31 +30,27 @@ This document provides a step-by-step implementation guide for building the MCP 
   - [x] Install development dependencies (pytest, black, ruff, mypy)
   - **Claude Code Tip**: "Help me set up a Python development environment for this project with proper dependency management"
 
-- [ ] **1.3** Create basic project documentation
-  - [ ] Create README.md with setup instructions
-  - [ ] Create CLAUDE.md with project-specific instructions
-  - [ ] Copy architecture documents to docs/
-  - **Claude Code Tip**: "Generate a professional README.md for this MCP PyBoy project based on our design documents"
+- [ ] **1.3** Complete project documentation and IDE setup
+  - [ ] Update README.md with comprehensive setup instructions
+  - [ ] Verify CLAUDE.md has complete uv workflow documentation
+  - [ ] Ensure all architecture documents are properly organized in docs/
+  - [x] Configure VS Code settings for Black/Ruff integration
+  - [ ] Verify IDE extensions and toolchain integration
+  - **Claude Code Tip**: "Update the README with detailed setup instructions and verify all IDE tooling works seamlessly"
 
-### Development Tools Setup
-- [ ] **1.4** Configure code quality tools
-  - [ ] Set up Black for code formatting
-  - [ ] Configure Ruff for linting
-  - [ ] Add MyPy for type checking
-  - [ ] Create pre-commit hooks
-  - **Claude Code Tip**: "Set up a complete Python code quality pipeline with formatting, linting, and type checking"
-
-- [ ] **1.5** Create testing infrastructure
-  - [ ] Set up pytest configuration
-  - [ ] Create test directory structure
+- [ ] **1.4** Establish development workflow
+  - [ ] Set up pre-commit hooks for automated quality checks
+  - [ ] Create comprehensive test directory structure
   - [ ] Add test fixtures for mock PyBoy instances
-  - **Claude Code Tip**: "Create a comprehensive pytest setup for testing an MCP server with mocked dependencies"
+  - [ ] Verify all dev tools work together (black, ruff, mypy, pytest)
+  - [ ] Test complete development workflow end-to-end
+  - **Claude Code Tip**: "Create a robust development workflow with pre-commit hooks and comprehensive testing infrastructure"
 
 ---
 
 ## Phase 2: Core MCP Server (Days 3-5)
 
-### Error System Foundation
+### Error System Foundation  
 - [ ] **2.1** Implement custom exception hierarchy
   - [ ] Create `src/mcp_server/errors.py`
   - [ ] Define MCPError base class with LLM-friendly attributes
