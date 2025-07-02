@@ -158,8 +158,10 @@ cython_debug/
 #  project, it is generally recommended to exclude hot reload related files.
 .idea/
 
-# VSCode
-.vscode/
+# VSCode (keep settings.json and extensions.json)
+.vscode/*
+!.vscode/settings.json
+!.vscode/extensions.json
 
 # Project-specific ignores
 

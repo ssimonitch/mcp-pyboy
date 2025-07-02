@@ -1,0 +1,31 @@
+{
+  "recommendations": [
+    // Python Development
+    "ms-python.python",
+    "ms-python.black-formatter",
+    "charliermarsh.ruff",
+    "ms-python.mypy-type-checker",
+    
+    // Testing
+    "ms-python.pytest",
+    
+    // File Support
+    "tamasfe.even-better-toml",
+    "yzhang.markdown-all-in-one",
+    
+    // Git Integration
+    "eamodio.gitlens",
+    
+    // General Development
+    "ms-vscode.vscode-json",
+    "bradlc.vscode-tailwindcss",
+    "streetsidesoftware.code-spell-checker"
+  ],
+  "unwantedRecommendations": [
+    // Avoid these to prevent conflicts
+    "ms-python.flake8",
+    "ms-python.isort",
+    "ms-python.autopep8",
+    "ms-python.pylint"
+  ]
+}

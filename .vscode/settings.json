@@ -1,0 +1,63 @@
+{
+  // Python Configuration
+  "python.defaultInterpreterPath": "./.venv/bin/python",
+  "python.terminal.activateEnvironment": true,
+  
+  // Formatting Configuration - Use Black Only
+  "editor.formatOnSave": true,
+  "editor.formatOnPaste": false,
+  "editor.formatOnType": false,
+  "[python]": {
+    "editor.defaultFormatter": "ms-python.black-formatter",
+    "editor.formatOnSave": true,
+    "editor.codeActionsOnSave": {
+      "source.organizeImports": true
+    }
+  },
+  
+  // Black Formatter Settings
+  "black-formatter.args": ["--line-length=88"],
+  
+  // Ruff Configuration - Linting Only (No Formatting)
+  "ruff.enable": true,
+  "ruff.lint.enable": true,
+  "ruff.format.enable": false,
+  "ruff.organizeImports": true,
+  "ruff.fixAll": true,
+  "ruff.codeAction.fixViolation.enable": true,
+  
+  // MyPy Configuration
+  "mypy-type-checker.enable": true,
+  "mypy-type-checker.args": ["--config-file=pyproject.toml"],
+  
+  // General Editor Settings
+  "editor.rulers": [88],
+  "files.trimTrailingWhitespace": true,
+  "files.insertFinalNewline": true,
+  "files.trimFinalNewlines": true,
+  
+  // Python-specific Settings
+  "python.linting.enabled": false, // Use Ruff instead of legacy linters
+  "python.analysis.typeCheckingMode": "basic",
+  "python.testing.pytestEnabled": true,
+  "python.testing.unittestEnabled": false,
+  "python.testing.pytestArgs": ["tests"],
+  
+  // File Association
+  "files.associations": {
+    "*.py": "python",
+    "pyproject.toml": "toml",
+    "*.md": "markdown"
+  },
+  
+  // Hide certain files from explorer
+  "files.exclude": {
+    "**/__pycache__": true,
+    "**/*.pyc": true,
+    ".venv": false,
+    ".mypy_cache": true,
+    ".pytest_cache": true,
+    ".ruff_cache": true,
+    "*.egg-info": true
+  }
+}

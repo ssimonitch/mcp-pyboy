@@ -11,7 +11,7 @@ __email__ = "your.email@example.com"
 
 # Imports will be added as modules are implemented
 # from .mcp_server.server import MCPServer
-# from .game_session.manager import GameSessionManager  
+# from .game_session.manager import GameSessionManager
 # from .notebook.notebook import NotebookManager
 
 __all__ = [
