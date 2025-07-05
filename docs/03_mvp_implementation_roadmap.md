@@ -6,15 +6,13 @@ This document provides a step-by-step implementation guide for building the MCP 
 
 ## Progress Tracking
 
-- **Total Tasks**: 45
-- **Estimated Time**: 2-3 weeks (solo developer)
-- **Current Progress**: 4/45 completed
+- **Total Tasks**: 24 (streamlined from original 45)
+- **Estimated Time**: 2 weeks (solo developer)
+- **Current Progress**: Phase 1 completed, Phase 2 ready to start
 
 ---
 
 ## Phase 1: Project Foundation (Days 1-2)
-
-*Updated: Consolidated overlapping tasks 1.4 and 1.5 into streamlined workflow. VS Code configuration completed.*
 
 ### Project Setup
 - [x] **1.1** Create Python project structure
@@ -52,223 +50,163 @@ This document provides a step-by-step implementation guide for building the MCP 
 
 ---
 
-## Phase 2: Core MCP Server (Days 3-5)
+## Phase 2: Core PyBoy Integration and Basic MCP Server (Days 3-5)
 
-### Error System Foundation
-- [ ] **2.1** Implement custom exception hierarchy
-  - [ ] Create `src/mcp_server/errors.py`
-  - [ ] Define MCPError base class with LLM-friendly attributes
-  - [ ] Implement specific exceptions (GameNotLoadedError, InvalidROMError, etc.)
-  - **Claude Code Tip**: "Implement the error hierarchy from our error handling design document, focusing on LLM-friendly error messages"
+### Basic MCP Server Structure
+- [ ] **2.1** Create MCP server using FastMCP
+  - [ ] Create `src/mcp_pyboy/server.py` using FastMCP
+  - [ ] Set up basic server with health check tool
+  - [ ] Test MCP server connectivity via stdio
+  - **Claude Code Tip**: "Create a basic FastMCP server with a simple health check tool to validate MCP connectivity"
 
-### Registry System
-- [ ] **2.2** Create tool registry foundation
-  - [ ] Implement `src/mcp_server/registry.py`
-  - [ ] Create ToolDefinition dataclass
-  - [ ] Implement @mcp_tool decorator
-  - [ ] Add parameter validation with JSON Schema
-  - **Claude Code Tip**: "Implement the ToolRegistry class from our registry design document, starting with the core registration functionality"
+### PyBoy Integration Foundation
+- [ ] **2.2** Implement PyBoy wrapper class
+  - [ ] Create `src/mcp_pyboy/emulator.py` with PyBoy wrapper
+  - [ ] Implement basic emulator lifecycle (start, stop, load ROM)
+  - [ ] Add LLM-friendly error handling for common PyBoy issues
+  - **Claude Code Tip**: "Create a PyBoy wrapper that handles emulator lifecycle and provides LLM-friendly error messages"
 
-- [ ] **2.3** Add tool discovery and management
-  - [ ] Implement tool scanning functionality
-  - [ ] Add tool lookup and validation methods
-  - [ ] Create tool execution with error handling
-  - **Claude Code Tip**: "Add the tool discovery and execution methods to the registry, ensuring proper error handling throughout"
+### Core Emulation Tools
+- [ ] **2.3** Implement essential MCP tools
+  - [ ] Implement `load_rom` tool with path validation
+  - [ ] Implement `get_screen` tool (returns base64 screenshot)
+  - [ ] Implement `press_button` tool with Game Boy button mapping
+  - [ ] Test all tools work end-to-end with test ROMs
+  - **Claude Code Tip**: "Create the three core tools that allow LLMs to load games, see the screen, and interact with controls"
 
-### Protocol Layer
-- [ ] **2.4** Implement JSON-RPC protocol handler
-  - [ ] Create `src/mcp_server/protocol.py`
-  - [ ] Implement JSONRPCRequest/Response classes
-  - [ ] Add request parsing and validation
-  - **Claude Code Tip**: "Implement the MCPProtocol class from our protocol design document, focusing on proper JSON-RPC 2.0 compliance"
-
-- [ ] **2.5** Add stdio transport and message loop
-  - [ ] Implement async stdio handling
-  - [ ] Create message processing loop
-  - [ ] Add comprehensive error boundary
-  - **Claude Code Tip**: "Complete the protocol implementation with async stdio transport and the main message processing loop"
-
-### MCP Server Integration
-- [ ] **2.6** Create main server module
-  - [ ] Implement `src/mcp_server/server.py`
-  - [ ] Wire together protocol and registry
-  - [ ] Add graceful startup/shutdown
-  - **Claude Code Tip**: "Create the main MCP server that integrates protocol and registry, with proper async lifecycle management"
-
-- [ ] **2.7** Test basic MCP functionality
-  - [ ] Create simple test tools for validation
-  - [ ] Test JSON-RPC request/response cycle
-  - [ ] Verify error handling works correctly
-  - **Claude Code Tip**: "Create comprehensive tests for the MCP server core functionality, focusing on the request/response cycle"
+### Basic Game Session Management
+- [ ] **2.4** Create session management
+  - [ ] Create singleton pattern for active game session
+  - [ ] Add ROM validation and loading
+  - [ ] Implement graceful session cleanup
+  - **Claude Code Tip**: "Implement a simple session manager that maintains one active game session and handles ROM lifecycle"
 
 ---
 
-## Phase 3: Game Session Management (Days 6-8)
+## Phase 3: Enhanced Tools and Session Management (Days 6-8)
 
-### PyBoy Integration
-- [ ] **3.1** Create emulator wrapper
-  - [ ] Implement `src/game_session/emulator.py`
-  - [ ] Wrap PyBoy with error handling
-  - [ ] Add screen capture functionality
-  - **Claude Code Tip**: "Create a PyBoy wrapper class that handles emulator lifecycle and provides safe access to game state"
+### Advanced Input Tools
+- [ ] **3.1** Implement advanced input controls
+  - [ ] Add input sequence and timing controls
+  - [ ] Implement hold/release button functionality
+  - [ ] Add frame-by-frame advancement (`tick` tool)
+  - **Claude Code Tip**: "Build on the basic press_button tool to add sequence controls and precise timing for complex game interactions"
 
-- [ ] **3.2** Implement input management
-  - [ ] Create `src/game_session/input_queue.py`
-  - [ ] Add thread-safe input queuing
-  - [ ] Implement button press with timing
-  - **Claude Code Tip**: "Implement an async input queue system that prevents race conditions in button presses"
+### Save State System
+- [ ] **3.2** Implement save state functionality
+  - [ ] Add save/load state tools
+  - [ ] Implement state file management with validation
+  - [ ] Create state persistence across tool calls
+  - **Claude Code Tip**: "Create save state tools that allow LLMs to create checkpoints and experiment with different approaches"
 
-### Session Management
-- [ ] **3.3** Create session manager
-  - [ ] Implement `src/game_session/manager.py`
-  - [ ] Add singleton session management
-  - [ ] Handle ROM loading and validation
-  - **Claude Code Tip**: "Create a session manager that maintains exactly one active game session and handles ROM lifecycle"
+### Enhanced Screen Capture
+- [ ] **3.3** Add advanced screen features
+  - [ ] Multiple output formats (base64, raw arrays)
+  - [ ] Screen region extraction for analysis
+  - [ ] Basic caching to reduce CPU usage
+  - **Claude Code Tip**: "Enhance the basic get_screen tool with different formats and region selection for more sophisticated analysis"
 
-- [ ] **3.4** Add state management
-  - [ ] Implement `src/game_session/state.py`
-  - [ ] Add save state creation and loading
-  - [ ] Handle state file management
-  - **Claude Code Tip**: "Implement save state management with proper file handling and error recovery"
-
-### Screen Capture System
-- [ ] **3.5** Implement screen capture
-  - [ ] Create `src/game_session/screen_capture.py`
-  - [ ] Add multiple output formats (base64, array)
-  - [ ] Implement caching for performance
-  - **Claude Code Tip**: "Create an efficient screen capture system with caching and multiple output formats for LLM consumption"
+### Input Queue System
+- [ ] **3.4** Create robust input handling
+  - [ ] Implement async input queue to prevent race conditions
+  - [ ] Add input validation and timing controls
+  - [ ] Handle input cancellation and error recovery
+  - **Claude Code Tip**: "Create an input queue system that ensures button presses are processed safely without corrupting game state"
 
 ---
 
-## Phase 4: Core MCP Tools (Days 9-11)
+## Phase 4: Game-Specific Notebook System (Days 9-10)
 
-### ROM Management Tools
-- [ ] **4.1** Implement ROM loading tools
-  - [ ] Create `src/handlers/emulation.py`
-  - [ ] Add `load_rom` tool with validation
-  - [ ] Add `list_roms` discovery tool
-  - **Claude Code Tip**: "Implement ROM management tools using our handler registration patterns, focusing on proper path validation"
+### Game-Specific Notebook Implementation
+- [ ] **4.1** Create notebook manager
+  - [ ] Implement `src/mcp_pyboy/notebook.py` with game-specific storage
+  - [ ] One notebook per ROM (identified by ROM hash)
+  - [ ] Sections: Current Objectives, Progress Log, Important Discoveries, Strategy Notes
+  - [ ] Auto-clear temporary notes when loading different ROM
+  - **Claude Code Tip**: "Create a notebook system focused on helping LLMs remember objectives and progress, not observable game state"
 
-- [ ] **4.2** Add emulation control tools
-  - [ ] Implement `reset_game` tool
-  - [ ] Add `set_emulation_speed` tool
-  - [ ] Create `get_session_status` tool
-  - **Claude Code Tip**: "Add emulation control tools that provide LLMs with game state management capabilities"
+### Notebook MCP Tools
+- [ ] **4.2** Implement notebook tools
+  - [ ] Add `save_notes` with section-based organization
+  - [ ] Implement `get_notes` returning current game's relevant information
+  - [ ] Create `update_objectives` for current goals management
+  - [ ] Add `list_sections` showing available note categories
+  - **Claude Code Tip**: "Create notebook tools that guide LLMs toward useful objective tracking rather than redundant state recording"
 
-### Input Control Tools
-- [ ] **4.3** Create basic input tools
-  - [ ] Create `src/handlers/input.py`
-  - [ ] Implement `press_button` tool
-  - [ ] Add `tick` tool for frame advancement
-  - **Claude Code Tip**: "Implement the core input tools that allow LLMs to control the Game Boy, ensuring proper timing and validation"
-
-- [ ] **4.4** Add advanced input tools
-  - [ ] Implement `send_input_sequence` tool
-  - [ ] Add `hold_button` and `release_button` tools
-  - [ ] Create input validation and queuing
-  - **Claude Code Tip**: "Add advanced input tools for complex game interactions, with comprehensive parameter validation"
-
-### Screen and State Tools
-- [ ] **4.5** Implement screen capture tools
-  - [ ] Create `src/handlers/screen.py`
-  - [ ] Add `get_screen` tool with format options
-  - [ ] Implement `get_game_area` for analysis
-  - **Claude Code Tip**: "Create screen capture tools that provide LLMs with visual game state in multiple useful formats"
-
-- [ ] **4.6** Add save state tools
-  - [ ] Create `src/handlers/state.py`
-  - [ ] Implement `save_state` and `load_state` tools
-  - [ ] Add state file management and validation
-  - **Claude Code Tip**: "Implement save state tools with proper file management and error handling for game state persistence"
+### Memory Guidance System
+- [ ] **4.3** Add intelligent note filtering
+  - [ ] Tool descriptions guide LLM on what to record vs. observe fresh
+  - [ ] Validation prevents storing obviously visible information
+  - [ ] Focus on decision-making context and non-obvious mechanics
+  - [ ] Size limiting with feedback on what to include/exclude
+  - **Claude Code Tip**: "Build validation that encourages useful memory while preventing redundant information storage"
 
 ---
 
-## Phase 5: Notebook System (Days 12-13)
+## Phase 5: Integration and Testing (Days 11-12)
 
-### Notebook Implementation
-- [ ] **5.1** Create notebook manager
-  - [ ] Implement `src/notebook/notebook.py`
-  - [ ] Create NotebookManager class with internal helpers
-  - [ ] Add markdown section parsing and generation
-  - **Claude Code Tip**: "Implement the simplified notebook system using our single-class approach with internal markdown handling"
-
-- [ ] **5.2** Add file operations and safety
-  - [ ] Implement atomic file writes
-  - [ ] Add backup and rollback functionality
-  - [ ] Create directory management for games
-  - **Claude Code Tip**: "Add robust file operations to the notebook system with atomic writes and proper error recovery"
-
-### Notebook Tools
-- [ ] **5.3** Create notebook MCP tools
-  - [ ] Add `save_notes` tool with section management
-  - [ ] Implement `get_notes` tool with format options
-  - [ ] Create `list_note_sections` and `delete_notes` tools
-  - **Claude Code Tip**: "Implement the notebook MCP tools using our handler registration patterns, ensuring proper integration with the notebook manager"
-
-- [ ] **5.4** Add size limits and validation
-  - [ ] Implement section size limits
-  - [ ] Add content validation
-  - [ ] Create cleanup suggestions for oversized notebooks
-  - **Claude Code Tip**: "Add size limiting and validation to prevent notebook bloat while providing helpful feedback to LLMs"
-
----
-
-## Phase 6: Integration and Testing (Days 14-15)
-
-### System Integration
-- [ ] **6.1** Create comprehensive integration tests
+### End-to-End Testing
+- [ ] **5.1** Create comprehensive integration tests
+  - [ ] Integration tests using `tests/fixtures/test_roms/`
   - [ ] Test complete ROM loading → gameplay → note taking flow
-  - [ ] Validate error handling across all components
-  - [ ] Test concurrent operations and edge cases
+  - [ ] Error handling validation with LLM-friendly messages
+  - [ ] Notebook persistence testing across sessions
   - **Claude Code Tip**: "Create integration tests that simulate real LLM usage patterns and validate the complete system flow"
 
-- [ ] **6.2** Add command-line interface
-  - [ ] Create `src/cli.py` for easy server startup
+### CLI and Basic Documentation
+- [ ] **5.2** Add command-line interface
+  - [ ] Create `src/mcp_pyboy/cli.py` for easy server startup
   - [ ] Add configuration options and help text
   - [ ] Implement proper signal handling
   - **Claude Code Tip**: "Create a user-friendly CLI that makes it easy to start and configure the MCP server"
 
-### Documentation and Examples
-- [ ] **6.3** Create usage examples
-  - [ ] Write example MCP interactions
-  - [ ] Document common LLM usage patterns
-  - [ ] Create troubleshooting guide
-  - **Claude Code Tip**: "Generate comprehensive usage examples and documentation that help users understand how to interact with the MCP server"
-
-- [ ] **6.4** Performance optimization
-  - [ ] Profile critical paths (screen capture, input processing)
+### Performance and Reliability
+- [ ] **5.3** Optimize critical paths
+  - [ ] Profile screen capture and input processing
   - [ ] Optimize memory usage and caching
-  - [ ] Add performance monitoring
-  - **Claude Code Tip**: "Help me profile and optimize the performance bottlenecks in the MCP server"
+  - [ ] Test concurrent operations and edge cases
+  - **Claude Code Tip**: "Profile and optimize the performance bottlenecks while ensuring system reliability"
+
+### Usage Documentation
+- [ ] **5.4** Create usage examples
+  - [ ] Write example MCP interactions
+  - [ ] Document notebook best practices
+  - [ ] Create basic troubleshooting guide
+  - **Claude Code Tip**: "Generate usage examples that help users understand how to interact effectively with the MCP server"
 
 ---
 
-## Phase 7: MVP Validation (Days 16-17)
+## Phase 6: MVP Validation and Polish (Days 13-14)
 
-### End-to-End Testing
-- [ ] **7.1** Test with real Game Boy ROMs
+### Real-World Testing
+- [ ] **6.1** Test with actual Game Boy ROMs
   - [ ] Validate with classic games (Tetris, Pokemon, etc.)
   - [ ] Test edge cases and error conditions
-  - [ ] Verify notebook persistence across sessions
-  - **Claude Code Tip**: "Help me create comprehensive end-to-end tests using real Game Boy ROMs to validate MVP functionality"
+  - [ ] Verify notebook system helps LLM maintain context effectively
+  - **Claude Code Tip**: "Test the complete system with real Game Boy ROMs to validate MVP functionality and notebook effectiveness"
 
-- [ ] **7.2** LLM integration testing
-  - [ ] Test actual Claude interactions
-  - [ ] Validate tool discovery and usage
-  - [ ] Check error message clarity and recovery
-  - **Claude Code Tip**: "Help me test the actual LLM integration by simulating realistic Claude interactions with the MCP server"
+### LLM Integration Testing
+- [ ] **6.2** Validate actual LLM interactions
+  - [ ] Test actual Claude interactions via Claude Desktop
+  - [ ] Validate tool discovery and usage patterns
+  - [ ] Check error message clarity and recovery guidance
+  - [ ] Test notebook system prevents redundant information storage
+  - **Claude Code Tip**: "Test the actual LLM integration by simulating realistic Claude interactions with the MCP server"
 
-### Polish and Documentation
-- [ ] **7.3** Create installation package
+### Packaging and Distribution
+- [ ] **6.3** Create installation package
   - [ ] Set up PyPI-ready package structure
   - [ ] Create installation and setup documentation
   - [ ] Add example configuration files
-  - **Claude Code Tip**: "Help me create a professional Python package with proper setup.py/pyproject.toml for PyPI distribution"
+  - [ ] Test installation process end-to-end
+  - **Claude Code Tip**: "Create a professional Python package with proper setup for PyPI distribution"
 
-- [ ] **7.4** Final documentation review
+### Final Documentation Review
+- [ ] **6.4** Polish documentation and examples
   - [ ] Update all documentation for accuracy
-  - [ ] Create quick start guide
+  - [ ] Create quick start guide with notebook usage examples
   - [ ] Add API reference documentation
+  - [ ] Include troubleshooting guide for common issues
   - **Claude Code Tip**: "Review and update all project documentation to ensure it's accurate and helpful for end users"
 
 ---
@@ -313,23 +251,31 @@ This document provides a step-by-step implementation guide for building the MCP 
 ### Core Functionality
 - [ ] **Load and play Game Boy ROMs successfully**
 - [ ] **LLM can discover and use all MCP tools**
-- [ ] **Error handling provides actionable feedback**
-- [ ] **Notebook system persists knowledge across sessions**
-- [ ] **Screen capture works in multiple formats**
-- [ ] **Input controls respond accurately**
+- [ ] **Error handling provides LLM-friendly actionable feedback**
+- [ ] **Game-specific notebook system helps LLM track objectives across sessions**
+- [ ] **Screen capture works with base64 output for LLM vision**
+- [ ] **Input controls respond accurately with proper timing**
+- [ ] **Save states allow experimentation and checkpointing**
+
+### LLM Integration Quality
+- [ ] **FastMCP server properly exposes tools via stdio transport**
+- [ ] **Tool descriptions guide effective LLM usage**
+- [ ] **Notebook system prevents redundant information storage**
+- [ ] **Error messages suggest corrective actions**
+- [ ] **All tools validate parameters and provide helpful feedback**
 
 ### Technical Quality
-- [ ] **All tests pass with >90% coverage**
+- [ ] **All tests pass with solid coverage**
 - [ ] **Code follows style guidelines (Black, Ruff)**
 - [ ] **Type checking passes (MyPy)**
-- [ ] **No memory leaks during extended use**
-- [ ] **Performance meets basic requirements (60fps emulation)**
+- [ ] **No memory leaks during extended gameplay**
+- [ ] **Emulation runs smoothly without performance issues**
 
 ### Documentation Quality
 - [ ] **README provides clear setup instructions**
-- [ ] **API documentation is complete**
-- [ ] **Examples demonstrate real usage**
-- [ ] **Troubleshooting guide covers common issues**
+- [ ] **API documentation covers all MCP tools**
+- [ ] **Examples demonstrate effective LLM usage patterns**
+- [ ] **Notebook best practices guide LLM behavior**
 
 ---
 
