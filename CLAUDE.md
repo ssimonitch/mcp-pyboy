@@ -34,27 +34,93 @@ source .venv/bin/activate
 
 ## Common Tasks
 
-- Run tests: `uv run pytest tests/ -v`
-- Format code: `uv run black src/ tests/`
-- Type check: `uv run mypy src/`
-- Lint code: `uv run ruff check src/ tests/`
-- Start server: `uv run python -m mcp_pyboy.server`
+- Run tests: `uv run test` (or `uv run pytest tests/ -v`)
+- Format code: `uv run format` (or `uv run black src/ tests/`)
+- Type check: `uv run typecheck` (or `uv run mypy src/`)
+- Lint code: `uv run lint` (or `uv run ruff check src/ tests/`)
+- Start MCP server: `uv run python -m mcp_pyboy.server` (when implemented)
+- Test MCP server: `uv run mcp dev src/mcp_pyboy/server.py` (development mode)
 - Install new dependency: `uv add <package-name>`
 - Install dev dependency: `uv add --dev <package-name>`
 
 ## Architecture Notes
 
+### MCP Server Design
+- Uses FastMCP for high-level MCP protocol handling
+- Tools exposed via stdio transport for LLM integration
+- Async/await patterns throughout for emulator interaction
+- LLM-friendly error messages with recovery suggestions
+
+### Game Session Management
 - Single PyBoy instance per session (singleton pattern)
 - Input commands queued to prevent race conditions
-- Screen captures cached for 100ms to reduce CPU
-- Markdown notes have 10KB limit per section
+- Screen captures cached to reduce CPU usage
+- Session state persists across tool calls
+
+### Notebook System
+- Game-specific notebooks (one per ROM, identified by hash)
+- Focused on objectives, progress, and non-obvious discoveries
+- Size limits per section to prevent bloat
+- Automatic validation against redundant information
 
 ## Testing ROMs
 
-Test ROMs located in `tests/fixtures/test_roms/`:
+Test ROMs for automated testing located in `tests/fixtures/test_roms/`:
+- Small, lightweight ROMs for unit and integration testing
+- No copyright concerns for CI/CD pipelines
 
-- `test_basic.gb`: Simple input/output test
-- `test_menu.gb`: Menu navigation test
+Game ROMs for manual testing stored in `@roms/` directory:
+- Classic Game Boy ROMs for real-world validation
+- Used for LLM integration testing and demos
+
+## MCP Development Guidelines
+
+### Tool Implementation Patterns
+
+```python
+from mcp.server.fastmcp import FastMCP
+
+mcp = FastMCP("MCP PyBoy Server")
+
+@mcp.tool()
+async def example_tool(param: str) -> str:
+    """Tool description for LLM - be specific about what it does."""
+    try:
+        # Implementation with proper error handling
+        return result
+    except SpecificError as e:
+        # LLM-friendly error with recovery suggestions
+        raise ValueError(f"Could not complete action: {e}. Try checking X or Y.")
+```
+
+### Error Handling Best Practices
+- Use LLM-friendly error messages that suggest corrective actions
+- Include context about what the LLM should try differently
+- Validate parameters early with helpful feedback
+- Handle emulator-specific errors gracefully
+
+### Async/Await Patterns
+- All emulator interactions must be async
+- Use proper async context managers for resource cleanup
+- Handle concurrent tool calls safely with session locks
+
+### Testing MCP Tools
+```bash
+# Test server connectivity
+uv run mcp dev src/mcp_pyboy/server.py
+
+# Run integration tests with test ROMs
+uv run pytest tests/integration/ -v
+
+# Test with Claude Desktop (install server locally)
+uv run mcp install src/mcp_pyboy/server.py --name "PyBoy Dev"
+```
+
+### Notebook System Guidelines
+- **Store**: Current objectives, progress checkpoints, strategy discoveries
+- **Don't Store**: Observable game state, basic controls, obvious information
+- **Validate**: Size limits, redundancy checks, relevance to gameplay
+- **Structure**: Sections for Objectives, Progress, Discoveries, Strategy Notes
 
 ## Git Repository Guidelines
 
@@ -81,34 +147,37 @@ Test ROMs located in `tests/fixtures/test_roms/`:
 - `git diff` - Show file differences
 - `git branch` - List branches
 
-## Feature Implementation System Guidelines
+## MCP Feature Implementation Guidelines
 
-### Feature Implementation Priority Rules
+### Tool Development Priority Rules
 
-- IMMEDIATE EXECUTION: Launch parallel Tasks immediately upon feature requests
-- NO CLARIFICATION: Skip asking what type of implementation unless absolutely critical
-- PARALLEL BY DEFAULT: Always use 7-parallel-Task method for efficiency
+- **CORE FUNCTIONALITY FIRST**: Implement basic tool functionality before advanced features
+- **LLM-FRIENDLY DESIGN**: Focus on clear tool descriptions and helpful error messages
+- **ASYNC BY DEFAULT**: All emulator interactions must be async/await
+- **ERROR RECOVERY**: Provide actionable guidance when tools fail
 
-### Parallel Feature Implementation Workflow
+### MCP Tool Implementation Workflow
 
-1. **Component**: Create main component file
-2. **Styles**: Create component styles/CSS
-3. **Tests**: Create test files
-4. **Types**: Create type definitions
-5. **Hooks**: Create custom hooks/utilities
-6. **Integration**: Update routing, imports, exports
-7. **Remaining**: Update package.json, documentation, configuration files
-8. **Review and Validation**: Coordinate integration, run tests, verify build, check for conflicts
+1. **Tool Function**: Create the core tool function with proper typing
+2. **Parameter Validation**: Add input validation with LLM-friendly error messages
+3. **Emulator Integration**: Connect to PyBoy session with proper error handling
+4. **Response Formatting**: Return data in LLM-consumable format
+5. **Tests**: Create unit and integration tests
+6. **Documentation**: Update tool descriptions and examples
+7. **Registration**: Register tool with FastMCP server
+8. **Integration Testing**: Test with actual MCP client (Claude Desktop)
 
-### Context Optimization Rules
+### Tool Design Best Practices
 
-- Strip out all comments when reading code files for analysis
-- Each task handles ONLY specified files or file types
-- Task 7 combines small config/doc updates to prevent over-splitting
+- **Descriptive Names**: Use clear, action-oriented tool names
+- **Comprehensive Docstrings**: Help LLMs understand tool purpose and usage
+- **Parameter Validation**: Validate early with helpful error messages
+- **Consistent Return Types**: Use predictable response formats
+- **Error Context**: Include guidance for what to try when tools fail
 
-### Feature Implementation Guidelines
+### Session Management Patterns
 
-- **CRITICAL**: Make MINIMAL CHANGES to existing patterns and structures
-- **CRITICAL**: Preserve existing naming conventions and file organization
-- Follow project's established architecture and component patterns
-- Use existing utility functions and avoid duplicating functionality
+- **Singleton Sessions**: Maintain one active PyBoy session
+- **State Persistence**: Preserve game state across tool calls
+- **Resource Cleanup**: Properly close sessions on server shutdown
+- **Thread Safety**: Use locks for concurrent tool access
