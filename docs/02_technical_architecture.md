@@ -176,14 +176,14 @@ sequenceDiagram
     participant Session
     participant PyBoy
     participant Notebook
-    
+
     LLM->>MCP: load_rom("pokemon.gb")
     MCP->>Session: create_session()
     Session->>PyBoy: load_rom()
     PyBoy-->>Session: rom_loaded
     Session-->>MCP: session_id
     MCP-->>LLM: {"success": true, "session_id": "..."}
-    
+
     LLM->>MCP: press_button("A")
     MCP->>Session: queue_input("A")
     Session->>PyBoy: button_press("A")
@@ -191,7 +191,7 @@ sequenceDiagram
     PyBoy-->>Session: frame_data
     Session-->>MCP: screen_state
     MCP-->>LLM: {"screen": "base64...", "changed": true}
-    
+
     LLM->>MCP: save_notes("discoveries", "A button confirms")
     MCP->>Notebook: update_section()
     Notebook-->>MCP: saved
@@ -206,7 +206,7 @@ sequenceDiagram
     participant WebSocket
     participant Browser
     participant Human
-    
+
     LLM->>MCP: request_human_help("Stuck at puzzle")
     MCP->>WebSocket: notify_takeover_request()
     WebSocket->>Browser: {event: "takeover_requested"}
@@ -215,11 +215,11 @@ sequenceDiagram
     Browser->>WebSocket: {action: "accept_control"}
     WebSocket->>MCP: control_transferred
     MCP-->>LLM: {"status": "human_control"}
-    
+
     Human->>Browser: Play game...
     Browser->>WebSocket: {input: "UP"}
     WebSocket->>MCP: forward_input()
-    
+
     Human->>Browser: Return control
     Browser->>WebSocket: {action: "return_control"}
     WebSocket->>MCP: control_returned
@@ -251,7 +251,7 @@ sequenceDiagram
 async def press_button(button: str, hold_frames: int = 1) -> dict:
     """
     Press a Game Boy button with proper timing.
-    
+
     Returns:
         dict: Contains 'success' boolean and 'screen' with new state
     """
@@ -335,7 +335,7 @@ class GameState(BaseModel):
     frame_count: int = Field(0, description="Total frames since load")
     is_paused: bool = Field(False, description="Whether emulation is paused")
     human_control: bool = Field(False, description="Whether human has control")
-    
+
     class Config:
         json_schema_extra = {
             "example": {
@@ -386,15 +386,15 @@ from mcp_pyboy import MCPServer
 async def test_full_game_flow():
     """Test complete LLM interaction flow"""
     server = MCPServer()
-    
+
     # Load ROM
     response = await server.handle_tool("load_rom", {"rom_path": "test.gb"})
     assert response["success"]
-    
+
     # Play game
     response = await server.handle_tool("press_button", {"button": "START"})
     assert "screen" in response["data"]
-    
+
     # Save knowledge
     response = await server.handle_tool("save_notes", {
         "section": "controls",
@@ -416,26 +416,26 @@ jobs:
     strategy:
       matrix:
         python-version: ["3.9", "3.10", "3.11", "3.12"]
-    
+
     steps:
     - uses: actions/checkout@v3
     - uses: actions/setup-python@v4
       with:
         python-version: ${{ matrix.python-version }}
-    
+
     - name: Install dependencies
       run: |
         pip install -e ".[dev]"
-    
+
     - name: Lint with ruff
       run: ruff check src/ tests/
-    
+
     - name: Type check with mypy
       run: mypy src/
-    
+
     - name: Test with pytest
       run: pytest tests/ --cov=src/ --cov-report=xml
-    
+
     - name: Upload coverage
       uses: codecov/codecov-action@v3
 ```
@@ -494,11 +494,11 @@ class ScreenCache:
         self._cache: Optional[bytes] = None
         self._last_frame: int = -1
         self._ttl_ms = ttl_ms
-    
+
     async def get_screen(self, current_frame: int) -> bytes:
         if current_frame == self._last_frame and self._cache:
             return self._cache
-        
+
         # Generate new screenshot
         screen_data = await self._capture_screen()
         self._cache = screen_data
@@ -512,12 +512,12 @@ class InputQueue:
     def __init__(self):
         self._queue: asyncio.Queue = asyncio.Queue()
         self._processing = False
-    
+
     async def add_input(self, button: str, frames: int = 1):
         await self._queue.put((button, frames))
         if not self._processing:
             asyncio.create_task(self._process_queue())
-    
+
     async def _process_queue(self):
         self._processing = True
         while not self._queue.empty():
@@ -534,13 +534,13 @@ def validate_rom_path(rom_path: str) -> Path:
     """Validate and sanitize ROM file paths"""
     path = Path(rom_path).resolve()
     allowed_dirs = [Path("roms").resolve(), Path.home() / "ROMs"]
-    
+
     if not any(path.is_relative_to(allowed) for allowed in allowed_dirs):
         raise ValueError("ROM path outside allowed directories")
-    
+
     if not path.suffix.lower() in [".gb", ".gbc"]:
         raise ValueError("Invalid ROM file extension")
-    
+
     return path
 ```
 
@@ -578,7 +578,7 @@ class PerformanceTracker:
             "frame_times": [],
             "websocket_latency": []
         }
-    
+
     async def track_tool_call(self, tool_name: str):
         start = perf_counter()
         try:
@@ -595,7 +595,7 @@ class PerformanceTracker:
 - Advanced save state management with branching
 - Turbo mode for faster gameplay sections
 
-### Phase 2 Features  
+### Phase 2 Features
 - Multi-emulator support (GBA, NES)
 - Cloud save synchronization
 - Collaborative sessions
@@ -610,7 +610,7 @@ class PerformanceTracker:
 This architecture provides a solid foundation for a solo developer to build a professional-grade MCP server that showcases:
 
 1. **Modern Python Development**: Async/await, type hints, dataclasses
-2. **Web Technologies**: WebSockets, Web Components, Service Workers  
+2. **Web Technologies**: WebSockets, Web Components, Service Workers
 3. **MCP Protocol Mastery**: Proper tool design and error handling
 4. **LLM Best Practices**: Clear interfaces, progressive disclosure, structured outputs
 5. **Professional Deployment**: CI/CD, documentation, testing

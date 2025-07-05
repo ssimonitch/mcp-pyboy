@@ -161,7 +161,7 @@ Once fully implemented, the server will provide these tools:
 
 For detailed architecture documentation, see:
 - [Project Design](docs/01_project_design.md)
-- [Technical Architecture](docs/02_technical_architecture.md) 
+- [Technical Architecture](docs/02_technical_architecture.md)
 - [MVP Implementation Roadmap](docs/03_mvp_implementation_roadmap.md)
 
 ## Contributing

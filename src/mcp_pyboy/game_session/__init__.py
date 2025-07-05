@@ -4,12 +4,13 @@ Game Session Management
 PyBoy integration, session management, and screen capture functionality.
 """
 
-from .emulator import EmulatorWrapper
-from .manager import GameSessionManager
-from .state import StateManager
+# Imports will be enabled as modules are implemented
+# from .emulator import EmulatorWrapper
+# from .manager import GameSessionManager
+# from .state import StateManager
 
-__all__ = [
-    "GameSessionManager",
-    "EmulatorWrapper",
-    "StateManager",
+__all__: list[str] = [
+    # "GameSessionManager",
+    # "EmulatorWrapper",
+    # "StateManager",
 ]

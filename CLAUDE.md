@@ -63,7 +63,7 @@ Test ROMs located in `tests/fixtures/test_roms/`:
 **CRITICAL**: Never perform git operations without explicit user permission:
 
 - ❌ `git add` - Do not stage files automatically
-- ❌ `git commit` - Do not create commits automatically  
+- ❌ `git commit` - Do not create commits automatically
 - ❌ `git push` - Do not push to remote repositories
 - ❌ `git merge` - Do not merge branches automatically
 - ❌ Any other git operations that modify repository state

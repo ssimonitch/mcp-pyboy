@@ -54,7 +54,7 @@ dev = [
 ]
 test = [
     "pytest>=7.4.0",
-    "pytest-asyncio>=0.21.0", 
+    "pytest-asyncio>=0.21.0",
     "pytest-mock>=3.11.0",
     "pytest-cov>=4.1.0",
 ]
@@ -66,6 +66,10 @@ docs = [
 
 [project.scripts]
 mcp-pyboy = "mcp_pyboy.cli:main"
+format = "mcp_pyboy.scripts.format:main"
+lint = "mcp_pyboy.scripts.lint:main"
+test = "mcp_pyboy.scripts.test:main"
+typecheck = "mcp_pyboy.scripts.typecheck:main"
 
 [project.urls]
 Homepage = "https://github.com/yourusername/mcp-pyboy"

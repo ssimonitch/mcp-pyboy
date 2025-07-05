@@ -4,7 +4,6 @@ Command Line Interface for MCP PyBoy Server
 Provides easy startup and configuration options for the MCP server.
 """
 
-
 import click
 
 # Module imports will be enabled as components are implemented
