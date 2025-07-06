@@ -28,16 +28,11 @@ requires-python = ">=3.10"
 
 # Core Dependencies
 dependencies = [
-    "mcp>=1.0.0",              # MCP protocol implementation
+    "mcp>=1.0.0",              # MCP protocol implementation (includes FastMCP)
     "pyboy>=2.0.0",            # Game Boy emulator engine
-    "fastapi>=0.104.0",        # Web framework with WebSocket support
-    "uvicorn>=0.24.0",         # ASGI server
-    "pydantic>=2.0.0",         # Data validation and settings
+    "pydantic>=2.0.0",         # Data validation and settings (used by FastMCP)
     "pillow>=10.0.0",          # Image processing for screenshots
-    "aiofiles>=23.0.0",        # Async file operations
-    "jsonschema>=4.0.0",       # JSON Schema validation
-    "structlog>=23.0.0",       # Structured logging
-    "click>=8.0.0",            # CLI framework
+    "aiofiles>=23.0.0",        # Async file operations for notebook system
 ]
 
 # Optional dependencies for different features
@@ -194,4 +189,9 @@ exclude_lines = [
     "if __name__ == .__main__.:",
     "class .*\\bProtocol\\):",
     "@(abc\\.)?abstractmethod",
+]
+
+[dependency-groups]
+dev = [
+    "mcp[cli]>=1.10.1",
 ]

@@ -38,8 +38,9 @@ source .venv/bin/activate
 - Format code: `uv run format` (or `uv run black src/ tests/`)
 - Type check: `uv run typecheck` (or `uv run mypy src/`)
 - Lint code: `uv run lint` (or `uv run ruff check src/ tests/`)
-- Start MCP server: `uv run python -m mcp_pyboy.server` (when implemented)
+- Start MCP server: `uv run python src/mcp_pyboy/server.py`
 - Test MCP server: `uv run mcp dev src/mcp_pyboy/server.py` (development mode)
+- Install for Claude Desktop: `uv run mcp install src/mcp_pyboy/server.py --name "PyBoy Dev"`
 - Install new dependency: `uv add <package-name>`
 - Install dev dependency: `uv add --dev <package-name>`
 
