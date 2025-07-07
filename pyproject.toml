@@ -59,6 +59,10 @@ docs = [
     "mkdocs-material>=9.0.0",  # Material theme
     "mkdocstrings[python]>=0.24.0",  # API documentation
 ]
+frontend = [
+    "fastapi>=0.116.0",
+    "uvicorn>=0.35.0",
+]
 
 [project.scripts]
 mcp-pyboy = "mcp_pyboy.cli:main"
