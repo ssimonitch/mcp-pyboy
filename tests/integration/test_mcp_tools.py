@@ -8,7 +8,8 @@ tool workflow from ROM loading to screen capture and button presses.
 from pathlib import Path
 
 import pytest
-from mcp_pyboy.server import get_emulator, get_screen, load_rom, press_button
+from mcp_pyboy.server import get_screen, load_rom, press_button
+from mcp_pyboy.session import get_session_manager
 
 from tests.fixtures.rom_generation import create_test_rom_data
 
@@ -23,12 +24,15 @@ def synthetic_rom(tmp_path: Path) -> Path:
 
 
 @pytest.fixture(autouse=True)
-def clean_emulator():
-    """Clean up emulator state before each test."""
+async def clean_session():
+    """Clean up session state before each test."""
     yield
     # Clean up after test
-    emulator = get_emulator()
-    emulator.stop()
+    try:
+        session_manager = get_session_manager()
+        await session_manager.session.stop()
+    except Exception:
+        pass  # Ignore cleanup errors
 
 
 @pytest.mark.integration
@@ -42,9 +46,9 @@ class TestMCPTools:
         result = await load_rom(str(synthetic_rom))
 
         assert result["success"] is True
-        assert "loaded successfully" in result["message"]
-        assert result["rom_info"]["name"] == "test.gb"
-        assert result["rom_info"]["size"] == 32 * 1024
+        assert "loaded" in result["message"]
+        assert result["rom_name"] == "test.gb"
+        assert result["session_state"] == "running"
 
     @pytest.mark.asyncio
     async def test_get_screen_tool(self, synthetic_rom: Path) -> None:
@@ -106,10 +110,10 @@ class TestMCPTools:
     @pytest.mark.asyncio
     async def test_error_handling_no_rom(self) -> None:
         """Test error handling when no ROM is loaded."""
-        with pytest.raises(ValueError, match="No ROM is currently loaded"):
+        with pytest.raises(ValueError, match="No ROM is loaded"):
             await get_screen()
 
-        with pytest.raises(ValueError, match="No ROM is currently loaded"):
+        with pytest.raises(ValueError, match="No ROM is loaded"):
             await press_button("A", 1)
 
     @pytest.mark.asyncio
@@ -134,5 +138,5 @@ class TestMCPTools:
     @pytest.mark.asyncio
     async def test_invalid_rom_path(self) -> None:
         """Test error handling for invalid ROM path."""
-        with pytest.raises(ValueError, match="ROM loading failed"):
+        with pytest.raises(ValueError, match="ROM file not found"):
             await load_rom("/nonexistent/path.gb")

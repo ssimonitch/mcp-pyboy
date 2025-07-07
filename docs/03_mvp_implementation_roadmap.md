@@ -8,7 +8,7 @@ This document provides a step-by-step implementation guide for building the MCP 
 
 - **Total Tasks**: 24 (streamlined from original 45)
 - **Estimated Time**: 2 weeks (solo developer)
-- **Current Progress**: Phase 1 completed, Phase 2 ready to start
+- **Current Progress**: Phase 1 completed, Phase 2.4 (Session Management) completed, Phase 2.5 (Web Frontend) in progress
 
 ---
 
@@ -74,44 +74,76 @@ This document provides a step-by-step implementation guide for building the MCP 
   - [x] Test all tools work end-to-end with test ROMs
   - **Claude Code Tip**: "Create the three core tools that allow LLMs to load games, see the screen, and interact with controls"
 
-### Basic Game Session Management
-- [ ] **2.4** Create session management
-  - [ ] Create singleton pattern for active game session
-  - [ ] Add ROM validation and loading
-  - [ ] Implement graceful session cleanup
-  - **Claude Code Tip**: "Implement a simple session manager that maintains one active game session and handles ROM lifecycle"
+### Session Management
+- [x] **2.4** Create session management
+  - [x] Create singleton pattern for active game session
+  - [x] Add ROM validation and loading with error recovery
+  - [x] Implement graceful session cleanup and crash recovery
+  - [x] Add session state tracking and metrics
+  - [x] Implement thread-safe concurrent access
+  - **Claude Code Tip**: "Implement a robust session manager that maintains one active game session and handles ROM lifecycle with recovery"
+
+### Web Frontend for Debugging
+- [ ] **2.5** Create minimal web frontend
+  - [ ] Create simple Flask/FastAPI debug server
+  - [ ] Live screen display (auto-refreshing base64 image)
+  - [ ] Visual button press indicators
+  - [ ] Current ROM and session status display
+  - [ ] Basic error/crash notifications
+  - [ ] MCP tool call log viewer
+  - **Claude Code Tip**: "Create a minimal web UI for debugging screen capture and session state during development"
+
+### Logging Infrastructure
+- [ ] **2.6** Add structured logging
+  - [ ] Structured logging for all MCP tool calls
+  - [ ] Performance metrics (screen capture time, input latency)
+  - [ ] Debug mode with verbose PyBoy output
+  - [ ] Log rotation and management
+  - **Claude Code Tip**: "Add comprehensive logging to help debug MCP interactions and performance issues"
 
 ---
 
-## Phase 3: Enhanced Tools and Session Management (Days 6-8)
+## Phase 3: Enhanced Tools with Proper Foundation (Days 6-8)
 
-### Advanced Input Tools
-- [ ] **3.1** Implement advanced input controls
-  - [ ] Add input sequence and timing controls
-  - [ ] Implement hold/release button functionality
-  - [ ] Add frame-by-frame advancement (`tick` tool)
-  - **Claude Code Tip**: "Build on the basic press_button tool to add sequence controls and precise timing for complex game interactions"
-
-### Save State System
-- [ ] **3.2** Implement save state functionality
-  - [ ] Add save/load state tools
-  - [ ] Implement state file management with validation
-  - [ ] Create state persistence across tool calls
-  - **Claude Code Tip**: "Create save state tools that allow LLMs to create checkpoints and experiment with different approaches"
-
-### Enhanced Screen Capture
-- [ ] **3.3** Add advanced screen features
-  - [ ] Multiple output formats (base64, raw arrays)
-  - [ ] Screen region extraction for analysis
-  - [ ] Basic caching to reduce CPU usage
-  - **Claude Code Tip**: "Enhance the basic get_screen tool with different formats and region selection for more sophisticated analysis"
-
-### Input Queue System
-- [ ] **3.4** Create robust input handling
+### Input Queue System (Foundation)
+- [ ] **3.1** Create robust input handling
   - [ ] Implement async input queue to prevent race conditions
   - [ ] Add input validation and timing controls
   - [ ] Handle input cancellation and error recovery
+  - [ ] Queue overflow handling
   - **Claude Code Tip**: "Create an input queue system that ensures button presses are processed safely without corrupting game state"
+
+### Advanced Input Controls
+- [ ] **3.2** Implement enhanced input tools
+  - [ ] Add input sequence and timing controls
+  - [ ] Implement hold/release button functionality
+  - [ ] Add frame-by-frame advancement (`tick` tool)
+  - [ ] Macro recording/playback
+  - **Claude Code Tip**: "Build on the basic press_button tool to add sequence controls and precise timing for complex game interactions"
+
+### Save State System
+- [ ] **3.3** Implement save state functionality
+  - [ ] Add save/load state tools with validation
+  - [ ] Implement state file management and organization
+  - [ ] Create state persistence across sessions
+  - [ ] Quick save/load slots
+  - **Claude Code Tip**: "Create save state tools that allow LLMs to create checkpoints and experiment with different approaches"
+
+### Enhanced Screen Capture
+- [ ] **3.4** Add advanced screen features
+  - [ ] Multiple output formats (base64, raw arrays)
+  - [ ] Screen region extraction for analysis
+  - [ ] Smart caching to reduce CPU usage
+  - [ ] Frame differencing for change detection
+  - **Claude Code Tip**: "Enhance the basic get_screen tool with different formats and region selection for more sophisticated analysis"
+
+### Debug Tools
+- [ ] **3.5** Add debugging and monitoring tools
+  - [ ] MCP tool to dump emulator state
+  - [ ] Session reset and recovery tools
+  - [ ] Memory usage monitoring
+  - [ ] Performance profiling commands
+  - **Claude Code Tip**: "Create debug tools to help diagnose issues and monitor system health during development"
 
 ---
 
@@ -145,8 +177,12 @@ This document provides a step-by-step implementation guide for building the MCP 
 
 ## Phase 5: Integration and Testing (Days 11-12)
 
-### End-to-End Testing
+### Enhanced Testing Infrastructure
 - [ ] **5.1** Create comprehensive integration tests
+  - [ ] Document test ROM selection criteria and acquisition strategy
+  - [ ] Create test suite with specific ROMs for each feature
+  - [ ] Mock PyBoy implementation for faster unit tests
+  - [ ] Performance benchmarks with target metrics
   - [ ] Integration tests using `tests/fixtures/test_roms/`
   - [ ] Test complete ROM loading → gameplay → note taking flow
   - [ ] Error handling validation with LLM-friendly messages
@@ -211,51 +247,18 @@ This document provides a step-by-step implementation guide for building the MCP 
 
 ---
 
-## Claude Code Collaboration Best Practices
-
-### Effective Prompting Strategies
-```markdown
-# Good Prompts for Claude Code:
-- "Implement the ToolRegistry class from our registry design document, focusing on the core registration functionality"
-- "Add comprehensive error handling to this function based on our error handling chain document"
-- "Create unit tests for this module that cover edge cases and error conditions"
-
-# Less Effective Prompts:
-- "Make this better"
-- "Fix the bugs"
-- "Add more features"
-```
-
-### File Organization Tips
-1. **Keep related code together** - Claude Code works better with focused, cohesive modules
-2. **Use descriptive file/function names** - Helps Claude understand context quickly
-3. **Add comprehensive docstrings** - Claude uses these to understand intent
-4. **Reference architecture documents** - Always mention which design document applies
-
-### Testing Strategy
-1. **Start with unit tests** - Easier for Claude to implement and validate
-2. **Use fixtures for complex setup** - Allows Claude to focus on test logic
-3. **Test error cases explicitly** - Critical for MCP server reliability
-4. **Create integration tests last** - Once individual components are stable
-
-### Debugging with Claude
-1. **Provide error messages and stack traces** - Complete context helps debugging
-2. **Share relevant code sections** - Don't expect Claude to remember everything
-3. **Ask for specific improvements** - "Make this error message more LLM-friendly"
-4. **Use Claude for code review** - "Review this implementation for potential issues"
-
----
-
 ## Success Criteria for MVP
 
 ### Core Functionality
 - [ ] **Load and play Game Boy ROMs successfully**
 - [ ] **LLM can discover and use all MCP tools**
 - [ ] **Error handling provides LLM-friendly actionable feedback**
+- [ ] **Session management handles crashes and recovery gracefully**
 - [ ] **Game-specific notebook system helps LLM track objectives across sessions**
 - [ ] **Screen capture works with base64 output for LLM vision**
 - [ ] **Input controls respond accurately with proper timing**
 - [ ] **Save states allow experimentation and checkpointing**
+- [ ] **Web frontend provides effective debugging capabilities**
 
 ### LLM Integration Quality
 - [ ] **FastMCP server properly exposes tools via stdio transport**
@@ -282,11 +285,12 @@ This document provides a step-by-step implementation guide for building the MCP 
 ## Next Steps After MVP
 
 Once MVP is complete, consider these enhancements:
-- Web frontend for human monitoring/takeover
-- Advanced screen analysis tools
-- Multi-emulator support (GBA, NES)
+- Enhanced web frontend with human takeover capabilities
+- Advanced screen analysis tools (object detection, OCR)
+- Multi-emulator support (GBA, NES, SNES)
 - Cloud save synchronization
-- Performance optimizations
-- Additional Game Boy features (sound, etc.)
+- Advanced performance optimizations
+- Additional Game Boy features (sound, multiplayer)
+- Reader-writer lock improvements for session management
 
 **Remember**: The goal is a working, demonstrable MVP that showcases the core concept. Perfect is the enemy of done!

@@ -14,11 +14,7 @@ import numpy as np
 from mcp.server.fastmcp import FastMCP
 from PIL import Image
 
-try:
-    from .emulator import EmulatorStateError, PyBoyEmulator, ROMError
-except ImportError:
-    # Handle case when running as standalone script
-    from mcp_pyboy.emulator import EmulatorStateError, PyBoyEmulator, ROMError
+from mcp_pyboy.session import SessionError, get_session_manager
 
 # Configure logging
 logging.basicConfig(
@@ -28,17 +24,6 @@ logger = logging.getLogger(__name__)
 
 # Create the MCP server instance
 mcp = FastMCP("MCP PyBoy Server")
-
-# Global emulator instance (singleton pattern)
-_emulator: PyBoyEmulator | None = None
-
-
-def get_emulator() -> PyBoyEmulator:
-    """Get or create the global emulator instance."""
-    global _emulator
-    if _emulator is None:
-        _emulator = PyBoyEmulator(headless=True)
-    return _emulator
 
 
 @mcp.tool()
@@ -107,23 +92,15 @@ async def load_rom(rom_path: str) -> dict[str, Any]:
     logger.info(f"Loading ROM: {rom_path}")
 
     try:
-        emulator = get_emulator()
-        emulator.load_rom(rom_path)
-        rom_info = emulator.get_rom_info()
+        session_manager = get_session_manager()
+        result = await session_manager.session.load_rom(rom_path)
 
-        logger.info(f"ROM loaded successfully: {rom_info['name']}")
-        return {
-            "success": True,
-            "message": f"ROM '{rom_info['name']}' loaded successfully",
-            "rom_info": rom_info,
-        }
+        logger.info(f"ROM loaded successfully: {result['rom_name']}")
+        return result
 
-    except ROMError as e:
-        logger.error(f"ROM loading failed: {e}")
-        raise ValueError(f"ROM loading failed: {e}") from e
-    except EmulatorStateError as e:
-        logger.error(f"Emulator state error: {e}")
-        raise ValueError(f"Emulator error: {e}") from e
+    except SessionError as e:
+        logger.error(f"Session error: {e}")
+        raise ValueError(str(e)) from e
     except Exception as e:
         logger.error(f"Unexpected error loading ROM: {e}")
         raise ValueError(
@@ -149,13 +126,8 @@ async def get_screen() -> dict[str, Any]:
     logger.info("Capturing screen...")
 
     try:
-        emulator = get_emulator()
-
-        if not emulator.is_ready():
-            raise ValueError(
-                "No ROM is currently loaded. Use load_rom() to load a ROM first."
-            )
-
+        session_manager = get_session_manager()
+        emulator = await session_manager.session.get_emulator()
         pyboy = emulator.get_pyboy_instance()
 
         # Get screen data as numpy array (144x160x4 RGBA)
@@ -190,14 +162,45 @@ async def get_screen() -> dict[str, Any]:
             "original_dimensions": {"width": 160, "height": 144},
         }
 
-    except EmulatorStateError as e:
-        logger.error(f"Emulator state error: {e}")
-        raise ValueError(f"Screen capture failed: {e}") from e
+    except SessionError as e:
+        logger.error(f"Session error: {e}")
+        raise ValueError(str(e)) from e
     except Exception as e:
         logger.error(f"Unexpected error capturing screen: {e}")
         raise ValueError(
             f"Failed to capture screen: {e}. Make sure a ROM is loaded and try again."
         ) from e
+
+
+@mcp.tool()
+async def get_session_info() -> dict[str, Any]:
+    """
+    Get detailed information about the current game session.
+
+    This tool provides information about the session state, loaded ROM,
+    performance metrics, and any error conditions. Use this to understand
+    the current state of the emulator and debug issues.
+
+    Returns:
+        dict: Comprehensive session information including state, ROM details, and metrics
+    """
+    logger.info("Getting session information")
+
+    try:
+        session_manager = get_session_manager()
+        session_info = await session_manager.session.get_info()
+
+        logger.info(f"Session info retrieved: state={session_info['state']}")
+        return session_info
+
+    except Exception as e:
+        logger.error(f"Error getting session info: {e}")
+        # Return partial info even on error
+        return {
+            "state": "unknown",
+            "error": str(e),
+            "message": "Failed to retrieve complete session information",
+        }
 
 
 @mcp.tool()
@@ -247,13 +250,8 @@ async def press_button(button: str, duration: int = 1) -> dict[str, Any]:
         raise ValueError("Duration cannot exceed 60 frames (1 second)")
 
     try:
-        emulator = get_emulator()
-
-        if not emulator.is_ready():
-            raise ValueError(
-                "No ROM is currently loaded. Use load_rom() to load a ROM first."
-            )
-
+        session_manager = get_session_manager()
+        emulator = await session_manager.session.get_emulator()
         pyboy = emulator.get_pyboy_instance()
         pyboy_button = valid_buttons[button_upper]
 
@@ -266,6 +264,10 @@ async def press_button(button: str, duration: int = 1) -> dict[str, Any]:
             if frame == duration - 1:
                 pyboy.button_release(pyboy_button)
 
+        # Record metrics
+        session_manager.session.record_frame_advance(duration)
+        session_manager.session.record_input()
+
         logger.info(f"Button {button} pressed successfully for {duration} frames")
 
         return {
@@ -276,9 +278,9 @@ async def press_button(button: str, duration: int = 1) -> dict[str, Any]:
             "frames_advanced": duration,
         }
 
-    except EmulatorStateError as e:
-        logger.error(f"Emulator state error: {e}")
-        raise ValueError(f"Button press failed: {e}") from e
+    except SessionError as e:
+        logger.error(f"Session error: {e}")
+        raise ValueError(str(e)) from e
     except Exception as e:
         logger.error(f"Unexpected error pressing button: {e}")
         raise ValueError(
@@ -297,6 +299,14 @@ async def main() -> None:
     except Exception as e:
         logger.error(f"Server error: {e}")
         sys.exit(1)
+    finally:
+        # Clean up session on shutdown
+        try:
+            session_manager = get_session_manager()
+            await session_manager.session.stop()
+            logger.info("Session cleaned up")
+        except Exception as e:
+            logger.warning(f"Error during cleanup: {e}")
 
 
 if __name__ == "__main__":

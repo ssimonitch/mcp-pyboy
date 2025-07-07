@@ -182,3 +182,19 @@ uv run mcp install src/mcp_pyboy/server.py --name "PyBoy Dev"
 - **State Persistence**: Preserve game state across tool calls
 - **Resource Cleanup**: Properly close sessions on server shutdown
 - **Thread Safety**: Use locks for concurrent tool access
+
+## Workflow Guidelines
+
+### Task Completion Protocol
+
+- **Complete Before Moving On**: When finishing a todo item, always summarize the work done and confirm with the user before proceeding to the next task
+- **Get Approval**: Wait for explicit user approval before starting the next todo item
+- **Document Updates**: When asked to update documentation, focus ONLY on the documentation update - do not make other code changes unless explicitly requested
+
+### Progress Summary Requirements
+
+When completing a todo item:
+1. Summarize what was implemented
+2. Highlight key design decisions
+3. Note any issues or considerations
+4. Request approval to proceed to the next task
