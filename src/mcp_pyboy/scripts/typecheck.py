@@ -7,12 +7,13 @@ from .utils import find_project_root
 
 
 def main() -> None:
-    """Run MyPy type checker on src/ directory."""
+    """Run MyPy type checker on src/ and tests/ directories."""
     project_root = find_project_root()
     src_dir = project_root / "src"
+    tests_dir = project_root / "tests"
 
     # Use python -m to ensure we use the correct environment
-    cmd = [sys.executable, "-m", "mypy", str(src_dir)]
+    cmd = [sys.executable, "-m", "mypy", str(src_dir), str(tests_dir)]
 
     try:
         result = subprocess.run(cmd, check=True, capture_output=True, text=True)

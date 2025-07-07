@@ -132,6 +132,7 @@ ignore = [
 # MyPy configuration
 [tool.mypy]
 python_version = "3.10"
+files = ["src/", "tests/"]
 check_untyped_defs = true
 disallow_any_generics = true
 disallow_incomplete_defs = true
@@ -148,6 +149,12 @@ module = [
     "mcp.*",
 ]
 ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = ["tests.*"]
+disallow_untyped_defs = false
+disallow_incomplete_defs = false
+check_untyped_defs = false
 
 # Pytest configuration
 [tool.pytest.ini_options]
