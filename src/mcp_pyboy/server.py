@@ -5,11 +5,20 @@ Main entry point for the MCP server that enables LLM interaction with Game Boy e
 Uses FastMCP for high-level MCP protocol handling.
 """
 
+import base64
 import logging
 import sys
 from typing import Any
 
+import numpy as np
 from mcp.server.fastmcp import FastMCP
+from PIL import Image
+
+try:
+    from .emulator import EmulatorStateError, PyBoyEmulator, ROMError
+except ImportError:
+    # Handle case when running as standalone script
+    from mcp_pyboy.emulator import EmulatorStateError, PyBoyEmulator, ROMError
 
 # Configure logging
 logging.basicConfig(
@@ -19,6 +28,17 @@ logger = logging.getLogger(__name__)
 
 # Create the MCP server instance
 mcp = FastMCP("MCP PyBoy Server")
+
+# Global emulator instance (singleton pattern)
+_emulator: PyBoyEmulator | None = None
+
+
+def get_emulator() -> PyBoyEmulator:
+    """Get or create the global emulator instance."""
+    global _emulator
+    if _emulator is None:
+        _emulator = PyBoyEmulator(headless=True)
+    return _emulator
 
 
 @mcp.tool()
@@ -64,6 +84,206 @@ async def get_server_info() -> dict[str, Any]:
         "emulator": "PyBoy",
         "supported_formats": [".gb", ".gbc"],
     }
+
+
+@mcp.tool()
+async def load_rom(rom_path: str) -> dict[str, Any]:
+    """
+    Load a Game Boy ROM file into the emulator.
+
+    This tool loads a Game Boy ROM file (.gb or .gbc) and starts emulation.
+    If another ROM is already loaded, it will be replaced. The ROM file must
+    exist and be a valid Game Boy ROM.
+
+    Args:
+        rom_path: Path to the ROM file to load (.gb or .gbc extension required)
+
+    Returns:
+        dict: Information about the loaded ROM including name, size, and status
+
+    Raises:
+        Error if ROM file doesn't exist, has invalid extension, or cannot be loaded
+    """
+    logger.info(f"Loading ROM: {rom_path}")
+
+    try:
+        emulator = get_emulator()
+        emulator.load_rom(rom_path)
+        rom_info = emulator.get_rom_info()
+
+        logger.info(f"ROM loaded successfully: {rom_info['name']}")
+        return {
+            "success": True,
+            "message": f"ROM '{rom_info['name']}' loaded successfully",
+            "rom_info": rom_info,
+        }
+
+    except ROMError as e:
+        logger.error(f"ROM loading failed: {e}")
+        raise ValueError(f"ROM loading failed: {e}") from e
+    except EmulatorStateError as e:
+        logger.error(f"Emulator state error: {e}")
+        raise ValueError(f"Emulator error: {e}") from e
+    except Exception as e:
+        logger.error(f"Unexpected error loading ROM: {e}")
+        raise ValueError(
+            f"Failed to load ROM: {e}. Please check the file path and try again."
+        ) from e
+
+
+@mcp.tool()
+async def get_screen() -> dict[str, Any]:
+    """
+    Capture the current Game Boy screen as a base64-encoded image.
+
+    This tool captures the current state of the Game Boy screen and returns it
+    as a base64-encoded PNG image. The LLM can use this to see what's happening
+    in the game and make decisions about next actions.
+
+    Returns:
+        dict: Screen capture data including base64 image and dimensions
+
+    Raises:
+        Error if no ROM is loaded or screen capture fails
+    """
+    logger.info("Capturing screen...")
+
+    try:
+        emulator = get_emulator()
+
+        if not emulator.is_ready():
+            raise ValueError(
+                "No ROM is currently loaded. Use load_rom() to load a ROM first."
+            )
+
+        pyboy = emulator.get_pyboy_instance()
+
+        # Get screen data as numpy array (144x160x4 RGBA)
+        screen_array = pyboy.screen.ndarray
+
+        # Convert RGBA to RGB (remove alpha channel)
+        if screen_array.shape[2] == 4:
+            screen_rgb = screen_array[:, :, :3]
+        else:
+            screen_rgb = screen_array
+
+        # Convert numpy array to PIL Image
+        image = Image.fromarray(screen_rgb.astype(np.uint8))
+
+        # Convert to base64 PNG
+        from io import BytesIO
+
+        buffer = BytesIO()
+        image.save(buffer, format="PNG")
+        buffer.seek(0)
+
+        image_base64 = base64.b64encode(buffer.getvalue()).decode("utf-8")
+
+        logger.info(f"Screen captured successfully ({image.size[0]}x{image.size[1]})")
+
+        return {
+            "success": True,
+            "message": "Screen captured successfully",
+            "image_base64": image_base64,
+            "image_format": "PNG",
+            "dimensions": {"width": image.size[0], "height": image.size[1]},
+            "original_dimensions": {"width": 160, "height": 144},
+        }
+
+    except EmulatorStateError as e:
+        logger.error(f"Emulator state error: {e}")
+        raise ValueError(f"Screen capture failed: {e}") from e
+    except Exception as e:
+        logger.error(f"Unexpected error capturing screen: {e}")
+        raise ValueError(
+            f"Failed to capture screen: {e}. Make sure a ROM is loaded and try again."
+        ) from e
+
+
+@mcp.tool()
+async def press_button(button: str, duration: int = 1) -> dict[str, Any]:
+    """
+    Press a Game Boy button for a specified duration.
+
+    This tool simulates pressing a Game Boy button and advances the emulation
+    by the specified number of frames. Valid buttons are the standard Game Boy
+    controls: A, B, START, SELECT, UP, DOWN, LEFT, RIGHT.
+
+    Args:
+        button: Button to press (A, B, START, SELECT, UP, DOWN, LEFT, RIGHT)
+        duration: Number of frames to hold the button (default: 1)
+
+    Returns:
+        dict: Information about the button press and resulting state
+
+    Raises:
+        Error if invalid button name, no ROM loaded, or button press fails
+    """
+    logger.info(f"Pressing button: {button} for {duration} frames")
+
+    # Valid Game Boy buttons (case insensitive)
+    valid_buttons = {
+        "A": "a",
+        "B": "b",
+        "START": "start",
+        "SELECT": "select",
+        "UP": "up",
+        "DOWN": "down",
+        "LEFT": "left",
+        "RIGHT": "right",
+    }
+
+    button_upper = button.upper()
+
+    if button_upper not in valid_buttons:
+        raise ValueError(
+            f"Invalid button '{button}'. Valid buttons are: {', '.join(valid_buttons.keys())}"
+        )
+
+    if duration < 1:
+        raise ValueError("Duration must be at least 1 frame")
+
+    if duration > 60:  # Limit to 1 second at 60 FPS
+        raise ValueError("Duration cannot exceed 60 frames (1 second)")
+
+    try:
+        emulator = get_emulator()
+
+        if not emulator.is_ready():
+            raise ValueError(
+                "No ROM is currently loaded. Use load_rom() to load a ROM first."
+            )
+
+        pyboy = emulator.get_pyboy_instance()
+        pyboy_button = valid_buttons[button_upper]
+
+        # Press and hold button for specified duration
+        for frame in range(duration):
+            pyboy.button_press(pyboy_button)
+            pyboy.tick()
+
+            # Release button on last frame
+            if frame == duration - 1:
+                pyboy.button_release(pyboy_button)
+
+        logger.info(f"Button {button} pressed successfully for {duration} frames")
+
+        return {
+            "success": True,
+            "message": f"Button '{button}' pressed for {duration} frames",
+            "button": button_upper,
+            "duration": duration,
+            "frames_advanced": duration,
+        }
+
+    except EmulatorStateError as e:
+        logger.error(f"Emulator state error: {e}")
+        raise ValueError(f"Button press failed: {e}") from e
+    except Exception as e:
+        logger.error(f"Unexpected error pressing button: {e}")
+        raise ValueError(
+            f"Failed to press button: {e}. Make sure a ROM is loaded and try again."
+        ) from e
 
 
 async def main() -> None:

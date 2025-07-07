@@ -553,6 +553,8 @@ source = { editable = "." }
 dependencies = [
     { name = "aiofiles" },
     { name = "mcp" },
+    { name = "numpy", version = "2.2.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11'" },
+    { name = "numpy", version = "2.3.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11'" },
     { name = "pillow" },
     { name = "pyboy" },
     { name = "pydantic" },
@@ -595,6 +597,7 @@ requires-dist = [
     { name = "mkdocs-material", marker = "extra == 'docs'", specifier = ">=9.0.0" },
     { name = "mkdocstrings", extras = ["python"], marker = "extra == 'docs'", specifier = ">=0.24.0" },
     { name = "mypy", marker = "extra == 'dev'", specifier = ">=1.7.0" },
+    { name = "numpy", specifier = ">=1.24.0" },
     { name = "pillow", specifier = ">=10.0.0" },
     { name = "pre-commit", marker = "extra == 'dev'", specifier = ">=3.0.0" },
     { name = "pyboy", specifier = ">=2.0.0" },

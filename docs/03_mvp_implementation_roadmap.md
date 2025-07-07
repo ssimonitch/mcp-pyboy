@@ -60,18 +60,18 @@ This document provides a step-by-step implementation guide for building the MCP 
   - **Claude Code Tip**: "Create a basic FastMCP server with a simple health check tool to validate MCP connectivity"
 
 ### PyBoy Integration Foundation
-- [ ] **2.2** Implement PyBoy wrapper class
+- [x] **2.2** Implement PyBoy wrapper class
   - [x] Create `src/mcp_pyboy/emulator.py` with PyBoy wrapper
   - [x] Implement basic emulator lifecycle (start, stop, load ROM)
   - [x] Add LLM-friendly error handling for common PyBoy issues
   - **Claude Code Tip**: "Create a PyBoy wrapper that handles emulator lifecycle and provides LLM-friendly error messages"
 
 ### Core Emulation Tools
-- [ ] **2.3** Implement essential MCP tools
-  - [ ] Implement `load_rom` tool with path validation
-  - [ ] Implement `get_screen` tool (returns base64 screenshot)
-  - [ ] Implement `press_button` tool with Game Boy button mapping
-  - [ ] Test all tools work end-to-end with test ROMs
+- [x] **2.3** Implement essential MCP tools
+  - [x] Implement `load_rom` tool with path validation
+  - [x] Implement `get_screen` tool (returns base64 screenshot)
+  - [x] Implement `press_button` tool with Game Boy button mapping
+  - [x] Test all tools work end-to-end with test ROMs
   - **Claude Code Tip**: "Create the three core tools that allow LLMs to load games, see the screen, and interact with controls"
 
 ### Basic Game Session Management

@@ -32,6 +32,7 @@ dependencies = [
     "pyboy>=2.0.0",            # Game Boy emulator engine
     "pydantic>=2.0.0",         # Data validation and settings (used by FastMCP)
     "pillow>=10.0.0",          # Image processing for screenshots
+    "numpy>=1.24.0",           # Numerical computing for screen data
     "aiofiles>=23.0.0",        # Async file operations for notebook system
 ]
 
@@ -172,6 +173,9 @@ markers = [
     "slow: marks tests as slow (deselect with '-m \"not slow\"')",
     "integration: marks tests as integration tests",
     "unit: marks tests as unit tests",
+]
+filterwarnings = [
+    "ignore:Using SDL2 binaries from pysdl2-dll:UserWarning:sdl2._internal",
 ]
 asyncio_mode = "auto"
 
