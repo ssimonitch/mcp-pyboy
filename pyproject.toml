@@ -8,9 +8,7 @@ version = "0.1.0"
 description = "MCP server that enables LLMs to interact with Game Boy games through PyBoy emulation"
 readme = "README.md"
 license = "MIT"
-authors = [
-    {name = "Your Name", email = "your.email@example.com"},
-]
+authors = [{ name = "Steven Simonitch", email = "ssimonitch@gmail.com" }]
 classifiers = [
     "Development Status :: 3 - Alpha",
     "Framework :: AsyncIO",
@@ -28,25 +26,25 @@ requires-python = ">=3.10"
 
 # Core Dependencies
 dependencies = [
-    "mcp>=1.0.0",              # MCP protocol implementation (includes FastMCP)
-    "pyboy>=2.0.0",            # Game Boy emulator engine
-    "pydantic>=2.0.0",         # Data validation and settings (used by FastMCP)
-    "pillow>=10.0.0",          # Image processing for screenshots
-    "numpy>=1.24.0",           # Numerical computing for screen data
-    "aiofiles>=23.0.0",        # Async file operations for notebook system
+    "mcp>=1.0.0",       # MCP protocol implementation (includes FastMCP)
+    "pyboy>=2.0.0",     # Game Boy emulator engine
+    "pydantic>=2.0.0",  # Data validation and settings (used by FastMCP)
+    "pillow>=10.0.0",   # Image processing for screenshots
+    "numpy>=1.24.0",    # Numerical computing for screen data
+    "aiofiles>=23.0.0", # Async file operations for notebook system
 ]
 
 # Optional dependencies for different features
 [project.optional-dependencies]
 dev = [
-    "pytest>=7.4.0",           # Testing framework
-    "pytest-asyncio>=0.21.0",  # Async test support
-    "pytest-mock>=3.11.0",     # Mocking for tests
-    "pytest-cov>=4.1.0",       # Coverage reporting
-    "black>=23.0.0",           # Code formatting
-    "ruff>=0.1.0",             # Linting
-    "mypy>=1.7.0",             # Type checking
-    "pre-commit>=3.0.0",       # Pre-commit hooks
+    "pytest>=7.4.0",          # Testing framework
+    "pytest-asyncio>=0.21.0", # Async test support
+    "pytest-mock>=3.11.0",    # Mocking for tests
+    "pytest-cov>=4.1.0",      # Coverage reporting
+    "black>=23.0.0",          # Code formatting
+    "ruff>=0.1.0",            # Linting
+    "mypy>=1.7.0",            # Type checking
+    "pre-commit>=3.0.0",      # Pre-commit hooks
 ]
 test = [
     "pytest>=7.4.0",
@@ -54,10 +52,7 @@ test = [
     "pytest-mock>=3.11.0",
     "pytest-cov>=4.1.0",
 ]
-frontend = [
-    "fastapi>=0.116.0",
-    "uvicorn>=0.35.0",
-]
+frontend = ["fastapi>=0.116.0", "uvicorn>=0.35.0"]
 
 [project.scripts]
 mcp-pyboy = "mcp_pyboy.cli:main"
@@ -77,13 +72,7 @@ Documentation = "https://yourusername.github.io/mcp-pyboy"
 packages = ["src/mcp_pyboy"]
 
 [tool.hatch.build.targets.sdist]
-include = [
-    "/src",
-    "/tests",
-    "/docs",
-    "/README.md",
-    "/LICENSE",
-]
+include = ["/src", "/tests", "/docs", "/README.md", "/LICENSE"]
 
 # Black configuration
 [tool.black]
@@ -120,14 +109,21 @@ select = [
     "UP", # pyupgrade
 ]
 ignore = [
-    "E501",  # line too long, handled by black
-    "B008",  # do not perform function calls in argument defaults
-    "C901",  # too complex
+    "E501", # line too long, handled by black
+    "B008", # do not perform function calls in argument defaults
+    "C901", # too complex
 ]
 
 [tool.ruff.lint.per-file-ignores]
 "__init__.py" = ["F401"]
 "tests/*" = ["B011"]
+
+# Import sorting configuration (isort compatibility)
+[tool.ruff.lint.isort]
+known-first-party = ["mcp_pyboy"]
+force-single-line = false
+split-on-trailing-comma = true
+combine-as-imports = true
 
 # MyPy configuration
 [tool.mypy]
@@ -144,10 +140,7 @@ warn_return_any = true
 strict_optional = true
 
 [[tool.mypy.overrides]]
-module = [
-    "pyboy.*",
-    "mcp.*",
-]
+module = ["pyboy.*", "mcp.*"]
 ignore_missing_imports = true
 
 [[tool.mypy.overrides]]
@@ -181,11 +174,7 @@ asyncio_mode = "auto"
 # Coverage configuration
 [tool.coverage.run]
 source = ["src"]
-omit = [
-    "*/tests/*",
-    "*/test_*.py",
-    "*/__init__.py",
-]
+omit = ["*/tests/*", "*/test_*.py", "*/__init__.py"]
 
 [tool.coverage.report]
 exclude_lines = [
@@ -202,6 +191,4 @@ exclude_lines = [
 ]
 
 [dependency-groups]
-dev = [
-    "mcp[cli]>=1.10.1",
-]
+dev = ["mcp[cli]>=1.10.1"]

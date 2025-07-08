@@ -27,10 +27,11 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.trustedhost import TrustedHostMiddleware
 from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
-from mcp_pyboy.server import get_screen, get_session_info, load_rom, press_button
-from mcp_pyboy.session import get_session_manager
 from pydantic import BaseModel, Field
 from pydantic_settings import BaseSettings
+
+from mcp_pyboy.server import get_screen, get_session_info, load_rom, press_button
+from mcp_pyboy.session import get_session_manager
 
 
 class Settings(BaseSettings):
