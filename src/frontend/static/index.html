@@ -7,8 +7,119 @@
     <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
-    <!-- Placeholder for debugging interface -->
-    <h1>MCP PyBoy Debugger</h1>
+    <div class="container">
+        <header>
+            <h1>🎮 MCP PyBoy Debugger</h1>
+            <div class="connection-status">
+                <span id="connection-indicator" class="status-disconnected">●</span>
+                <span id="connection-text">Disconnected</span>
+            </div>
+        </header>
+
+        <main class="main-content">
+            <!-- Game Boy Screen Section -->
+            <section class="screen-section">
+                <h2>Game Boy Screen</h2>
+                <div class="screen-container">
+                    <canvas id="gameboy-screen" width="160" height="144"></canvas>
+                    <div id="screen-overlay" class="screen-overlay">
+                        <p>No ROM loaded</p>
+                        <p>Load a ROM to see the screen</p>
+                    </div>
+                </div>
+                <div class="screen-info">
+                    <span id="screen-fps">FPS: --</span>
+                    <span id="last-update">Last update: --</span>
+                </div>
+            </section>
+
+            <!-- Controls Section -->
+            <section class="controls-section">
+                <h2>Game Boy Controls</h2>
+                <div class="gameboy-controls">
+                    <!-- D-Pad -->
+                    <div class="dpad-container">
+                        <button class="dpad-btn dpad-up" data-button="UP">↑</button>
+                        <div class="dpad-middle">
+                            <button class="dpad-btn dpad-left" data-button="LEFT">←</button>
+                            <div class="dpad-center"></div>
+                            <button class="dpad-btn dpad-right" data-button="RIGHT">→</button>
+                        </div>
+                        <button class="dpad-btn dpad-down" data-button="DOWN">↓</button>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="action-buttons">
+                        <button class="action-btn btn-b" data-button="B">B</button>
+                        <button class="action-btn btn-a" data-button="A">A</button>
+                    </div>
+
+                    <!-- System Buttons -->
+                    <div class="system-buttons">
+                        <button class="system-btn" data-button="SELECT">SELECT</button>
+                        <button class="system-btn" data-button="START">START</button>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <aside class="sidebar">
+            <!-- ROM Management -->
+            <section class="rom-section">
+                <h3>ROM Management</h3>
+                <div class="rom-controls">
+                    <input type="text" id="rom-path" placeholder="Path to ROM file" value="@roms/">
+                    <button id="load-rom-btn">Load ROM</button>
+                </div>
+                <div id="rom-info" class="info-panel">
+                    <p>No ROM loaded</p>
+                </div>
+            </section>
+
+            <!-- Session Information -->
+            <section class="session-section">
+                <h3>Session Info</h3>
+                <div id="session-info" class="info-panel">
+                    <div class="info-row">
+                        <span class="label">State:</span>
+                        <span id="session-state">idle</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="label">Frames:</span>
+                        <span id="session-frames">0</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="label">Inputs:</span>
+                        <span id="session-inputs">0</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="label">Duration:</span>
+                        <span id="session-duration">0s</span>
+                    </div>
+                </div>
+                <button id="reset-session-btn" class="danger-btn">Reset Session</button>
+            </section>
+
+            <!-- Debug Log -->
+            <section class="log-section">
+                <h3>Debug Log</h3>
+                <div class="log-controls">
+                    <button id="clear-log-btn">Clear</button>
+                    <label>
+                        <input type="checkbox" id="auto-scroll" checked>
+                        Auto-scroll
+                    </label>
+                </div>
+                <div id="debug-log" class="log-container">
+                    <div class="log-entry info">
+                        <span class="timestamp">--:--:--</span>
+                        <span class="message">Debugger started</span>
+                    </div>
+                </div>
+            </section>
+        </aside>
+    </div>
+
     <script src="/static/app.js"></script>
 </body>
 </html>

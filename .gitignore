@@ -222,3 +222,6 @@ screenshots/
 # Documentation build
 docs/site/
 mkdocs.yml
+
+# Claude
+.claude/

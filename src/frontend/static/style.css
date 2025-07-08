@@ -1,9 +1,403 @@
 /* MCP PyBoy Debugger Styles */
 
-/* Placeholder for styling */
-body {
-    font-family: system-ui, -apple-system, sans-serif;
+* {
     margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'SF Pro Display', system-ui, -apple-system, sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    color: #333;
+}
+
+.container {
+    display: grid;
+    grid-template-columns: 1fr 300px;
+    grid-template-rows: auto 1fr;
+    gap: 20px;
+    max-width: 1400px;
+    margin: 0 auto;
     padding: 20px;
-    background-color: #f5f5f5;
+    min-height: 100vh;
+}
+
+/* Header */
+header {
+    grid-column: 1 / -1;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    padding: 15px 25px;
+    border-radius: 12px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+h1 {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: #2d3748;
+}
+
+.connection-status {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 500;
+}
+
+#connection-indicator {
+    font-size: 1.2rem;
+    transition: color 0.3s ease;
+}
+
+.status-connected { color: #10b981; }
+.status-disconnected { color: #ef4444; }
+.status-error { color: #f59e0b; }
+
+/* Main Content */
+.main-content {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+section {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+h2, h3 {
+    margin-bottom: 15px;
+    color: #2d3748;
+    font-weight: 600;
+}
+
+h2 { font-size: 1.4rem; }
+h3 { font-size: 1.2rem; }
+
+/* Game Boy Screen */
+.screen-container {
+    position: relative;
+    display: inline-block;
+    background: #8b956d;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+#gameboy-screen {
+    display: block;
+    border: 2px solid #1a202c;
+    border-radius: 4px;
+    image-rendering: pixelated;
+    image-rendering: -moz-crisp-edges;
+    image-rendering: crisp-edges;
+    background: #1a202c;
+    width: 320px;
+    height: 288px;
+}
+
+.screen-overlay {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    color: #9ca3af;
+    pointer-events: none;
+}
+
+.screen-info {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 10px;
+    font-size: 0.875rem;
+    color: #6b7280;
+}
+
+/* Game Boy Controls */
+.gameboy-controls {
+    display: grid;
+    grid-template-columns: 150px 1fr 150px;
+    gap: 30px;
+    align-items: center;
+    justify-items: center;
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+/* D-Pad */
+.dpad-container {
+    display: grid;
+    grid-template-rows: 1fr 1fr 1fr;
+    gap: 2px;
+    width: 100px;
+    height: 100px;
+}
+
+.dpad-middle {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 2px;
+}
+
+.dpad-btn {
+    background: #4a5568;
+    border: none;
+    color: white;
+    font-size: 1.2rem;
+    font-weight: bold;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    user-select: none;
+}
+
+.dpad-btn:hover {
+    background: #2d3748;
+    transform: translateY(-1px);
+}
+
+.dpad-btn:active {
+    background: #1a202c;
+    transform: translateY(1px);
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.dpad-up, .dpad-down { grid-column: 2; height: 30px; }
+.dpad-left, .dpad-right { width: 30px; height: 100%; }
+.dpad-center { background: #2d3748; border-radius: 50%; }
+
+/* Action Buttons */
+.action-buttons {
+    display: flex;
+    gap: 15px;
+}
+
+.action-btn {
+    width: 50px;
+    height: 50px;
+    border: none;
+    border-radius: 50%;
+    font-size: 1.1rem;
+    font-weight: bold;
+    color: white;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    user-select: none;
+}
+
+.btn-b { background: #e53e3e; }
+.btn-a { background: #3182ce; }
+
+.action-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.action-btn:active {
+    transform: translateY(0);
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+/* System Buttons */
+.system-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.system-btn {
+    padding: 8px 16px;
+    background: #2d3748;
+    border: none;
+    color: white;
+    border-radius: 20px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    user-select: none;
+}
+
+.system-btn:hover {
+    background: #4a5568;
+    transform: translateY(-1px);
+}
+
+.system-btn:active {
+    background: #1a202c;
+    transform: translateY(1px);
+}
+
+/* Sidebar */
+.sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+/* ROM Controls */
+.rom-controls {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 15px;
+}
+
+#rom-path {
+    flex: 1;
+    padding: 8px 12px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    font-size: 0.875rem;
+}
+
+#load-rom-btn {
+    padding: 8px 16px;
+    background: #10b981;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.15s ease;
+}
+
+#load-rom-btn:hover { background: #059669; }
+
+/* Info Panels */
+.info-panel {
+    background: #f9fafb;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+    padding: 12px;
+    font-size: 0.875rem;
+}
+
+.info-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 8px;
+}
+
+.info-row:last-child { margin-bottom: 0; }
+
+.label {
+    font-weight: 500;
+    color: #6b7280;
+}
+
+/* Buttons */
+.danger-btn {
+    width: 100%;
+    padding: 8px 16px;
+    background: #ef4444;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.15s ease;
+    margin-top: 15px;
+}
+
+.danger-btn:hover { background: #dc2626; }
+
+/* Debug Log */
+.log-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.log-controls button {
+    padding: 4px 8px;
+    background: #6b7280;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    cursor: pointer;
+}
+
+.log-controls label {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 0.75rem;
+    color: #6b7280;
+}
+
+.log-container {
+    background: #1a202c;
+    border-radius: 6px;
+    padding: 10px;
+    max-height: 200px;
+    overflow-y: auto;
+    font-family: 'SF Mono', Consolas, monospace;
+    font-size: 0.75rem;
+}
+
+.log-entry {
+    margin-bottom: 4px;
+    display: flex;
+    gap: 8px;
+}
+
+.timestamp {
+    color: #9ca3af;
+    min-width: 60px;
+}
+
+.message {
+    flex: 1;
+}
+
+.log-entry.info .message { color: #60a5fa; }
+.log-entry.success .message { color: #34d399; }
+.log-entry.warning .message { color: #fbbf24; }
+.log-entry.error .message { color: #f87171; }
+
+/* Button Press Animation */
+.btn-pressed {
+    animation: buttonPress 0.15s ease;
+}
+
+@keyframes buttonPress {
+    0% { transform: scale(1); }
+    50% { transform: scale(0.95); }
+    100% { transform: scale(1); }
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+    .container {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto auto auto;
+    }
+    
+    .sidebar {
+        grid-row: 3;
+    }
+    
+    #gameboy-screen {
+        width: 240px;
+        height: 216px;
+    }
+    
+    .gameboy-controls {
+        max-width: 400px;
+        gap: 20px;
+    }
 }
