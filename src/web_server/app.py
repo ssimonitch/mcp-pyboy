@@ -57,9 +57,27 @@ def get_settings() -> Settings:
 SettingsDep = Annotated[Settings, Depends(get_settings)]
 
 # Configure logging with environment variable support
-log_level = getattr(logging, os.getenv("LOG_LEVEL", "INFO").upper())
-logging.basicConfig(level=log_level)
+log_level_name = os.getenv("LOG_LEVEL", "INFO").upper()
+log_level = getattr(logging, log_level_name)
+logging.basicConfig(
+    level=log_level,
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+    datefmt="%Y-%m-%d %H:%M:%S",
+)
 logger = logging.getLogger(__name__)
+
+# Set specific log levels for noisy components
+if log_level > logging.DEBUG:
+    # Reduce noise from uvicorn and other components when not in debug mode
+    logging.getLogger("uvicorn.access").setLevel(logging.WARNING)
+    logging.getLogger("uvicorn.error").setLevel(logging.INFO)
+    # Reduce noise from MCP server components during routine operations
+    logging.getLogger("mcp_server.server").setLevel(logging.WARNING)
+    logging.getLogger("mcp_server.session").setLevel(logging.WARNING)
+    logging.getLogger("mcp_server.emulator").setLevel(logging.WARNING)
+else:
+    # In debug mode, show all logs but with clear formatting
+    logger.info("Debug mode enabled - showing all logs")
 
 
 # Create FastAPI app with default title (will be shown in settings endpoint)
@@ -93,6 +111,7 @@ class ConnectionManager:
     def __init__(self) -> None:
         self.active_connections: set[WebSocket] = set()
         self._lock = asyncio.Lock()
+        self.last_status_log = 0.0  # Track last time we logged status
 
     async def connect(self, websocket: WebSocket) -> None:
         await websocket.accept()
@@ -143,32 +162,75 @@ async def websocket_endpoint(websocket: WebSocket, settings: SettingsDep) -> Non
     await manager.connect(websocket)
     update_interval = settings.update_interval
     last_screen_hash = None
+    last_rom_state = None  # Track ROM state to log only on changes
+    status_log_interval = 60.0  # Log status every 60 seconds
 
     try:
         # Start background task for updates
         async def send_updates() -> None:
-            nonlocal last_screen_hash
+            nonlocal last_screen_hash, last_rom_state
             while True:
                 try:
-                    screen_data = await get_screen()
-                    # Only send if screen changed
-                    screen_hash = hash(str(screen_data))
-                    if screen_hash != last_screen_hash:
-                        session_info = await get_session_info()
+                    # First check session state to determine if ROM is loaded
+                    session_info = await get_session_info()
+                    current_rom_state = session_info.get("rom_loaded", False)
+                    current_time = time()
+
+                    # Log state changes or periodic status updates
+                    if (
+                        current_rom_state != last_rom_state
+                        or current_time - manager.last_status_log > status_log_interval
+                    ):
+                        if current_rom_state != last_rom_state:
+                            logger.info(
+                                f"WebSocket: ROM state changed to {'loaded' if current_rom_state else 'not loaded'}"
+                            )
+                        else:
+                            logger.debug(
+                                f"WebSocket: Status update - ROM {'loaded' if current_rom_state else 'not loaded'}, {len(manager.active_connections)} connections"
+                            )
+                        manager.last_status_log = current_time
+                        last_rom_state = current_rom_state
+
+                    if current_rom_state:
+                        # ROM is loaded - get screen data and send update
+                        try:
+                            screen_data = await get_screen()
+                            # Only send if screen changed
+                            screen_hash = hash(str(screen_data))
+                            if screen_hash != last_screen_hash:
+                                message = {
+                                    "type": "screen_update",
+                                    "screen": screen_data,
+                                    "session": session_info,
+                                    "timestamp": current_time,
+                                }
+                                await websocket.send_text(json.dumps(message))
+                                last_screen_hash = screen_hash
+                                logger.debug("WebSocket: Screen update sent")
+                        except Exception as e:
+                            # Log screen capture errors as they're unexpected when ROM is loaded
+                            logger.error(f"Error capturing screen: {e}")
+                    else:
+                        # No ROM loaded - send status message (minimal logging)
                         message = {
-                            "type": "update",
-                            "screen": screen_data,
+                            "type": "no_rom_status",
                             "session": session_info,
-                            "timestamp": time(),
+                            "message": "No ROM loaded. Select a ROM to start playing.",
+                            "timestamp": current_time,
                         }
                         await websocket.send_text(json.dumps(message))
-                        last_screen_hash = screen_hash
+                        # Reset screen hash when no ROM is loaded
+                        last_screen_hash = None
+                        logger.debug("WebSocket: No ROM status sent")
 
                     await asyncio.sleep(update_interval)
                 except WebSocketDisconnect:
+                    logger.debug("WebSocket: Client disconnected from update loop")
                     break
                 except Exception as e:
-                    logger.error(f"Error in update loop: {e}")
+                    # Only log unexpected errors (not the common "no ROM" case)
+                    logger.error(f"Unexpected error in update loop: {e}")
                     await asyncio.sleep(update_interval)
 
         # Start update task
@@ -427,10 +489,13 @@ def main() -> None:
     # Get settings once for startup
     settings = get_settings()
 
+    # Log startup information
     logger.info("Starting MCP PyBoy Debugger...")
+    logger.info(f"Log level: {log_level_name}")
     logger.info(
         f"Web interface will be available at: http://{settings.host}:{settings.port}"
     )
+    logger.debug(f"Update interval: {settings.update_interval}s")
 
     uvicorn.run(
         "web_server.app:app",

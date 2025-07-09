@@ -139,7 +139,11 @@ class PyBoyDebugger {
     handleMessage(data) {
         switch (data.type) {
             case 'update':
+            case 'screen_update':
                 this.handleScreenUpdate(data.screen, data.session);
+                break;
+            case 'no_rom_status':
+                this.handleNoRomStatus(data.session, data.message);
                 break;
             case 'error':
                 this.log('error', data.message);
@@ -173,6 +177,21 @@ class PyBoyDebugger {
         }
         
         this.updateFPS();
+        this.lastUpdate.textContent = `Last update: ${new Date().toLocaleTimeString()}`;
+    }
+
+    handleNoRomStatus(sessionData, message) {
+        // Show the overlay with the no ROM message
+        this.screenOverlay.style.display = 'block';
+        this.screenOverlay.innerHTML = `
+            <p>No ROM loaded</p>
+            <p>${message || 'Load a ROM to see the screen'}</p>
+        `;
+        
+        if (sessionData) {
+            this.updateSessionInfo(sessionData);
+        }
+        
         this.lastUpdate.textContent = `Last update: ${new Date().toLocaleTimeString()}`;
     }
 

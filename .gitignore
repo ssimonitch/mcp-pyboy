@@ -167,7 +167,9 @@ cython_debug/
 
 # ROM files (don't commit copyrighted content)
 roms/*.gb
+roms/*.gb.ram
 roms/*.gbc
+roms/*.gbc.ram
 !roms/.gitkeep
 !roms/README.md
 
