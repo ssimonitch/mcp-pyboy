@@ -248,8 +248,95 @@ h3 { font-size: 1.2rem; }
 /* ROM Controls */
 .rom-controls {
     display: flex;
-    gap: 8px;
+    flex-direction: column;
+    gap: 15px;
     margin-bottom: 15px;
+}
+
+.rom-list-container h4 {
+    margin: 0 0 10px 0;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #374151;
+}
+
+.rom-list {
+    background: #f9fafb;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+    max-height: 150px;
+    overflow-y: auto;
+    margin-bottom: 10px;
+}
+
+.rom-list-loading {
+    padding: 20px;
+    text-align: center;
+    color: #6b7280;
+    font-size: 0.875rem;
+}
+
+.rom-list-empty {
+    padding: 20px;
+    text-align: center;
+    color: #6b7280;
+    font-size: 0.875rem;
+}
+
+.rom-item {
+    display: flex;
+    flex-direction: column;
+    padding: 10px 12px;
+    border-bottom: 1px solid #e5e7eb;
+    cursor: pointer;
+    transition: background 0.15s ease;
+}
+
+.rom-item:last-child {
+    border-bottom: none;
+}
+
+.rom-item:hover {
+    background: #f3f4f6;
+}
+
+.rom-item.selected {
+    background: #dbeafe;
+    border-color: #3b82f6;
+}
+
+.rom-name {
+    font-weight: 500;
+    color: #111827;
+    font-size: 0.875rem;
+    margin-bottom: 2px;
+}
+
+.rom-details {
+    font-size: 0.75rem;
+    color: #6b7280;
+    display: flex;
+    justify-content: space-between;
+}
+
+.rom-size {
+    font-family: monospace;
+}
+
+.secondary-btn {
+    padding: 8px 16px;
+    background: #6b7280;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.15s ease;
+}
+
+.secondary-btn:hover { 
+    background: #4b5563; 
 }
 
 #rom-path {

@@ -12,6 +12,7 @@ class PyBoyDebugger {
         this.initializeElements();
         this.setupEventListeners();
         this.connect();
+        this.loadRomList();
     }
 
     initializeElements() {
@@ -25,9 +26,10 @@ class PyBoyDebugger {
         this.lastUpdate = document.getElementById('last-update');
         
         // ROM elements
-        this.romPath = document.getElementById('rom-path');
-        this.loadRomBtn = document.getElementById('load-rom-btn');
+        this.romList = document.getElementById('rom-list');
+        this.refreshRomsBtn = document.getElementById('refresh-roms-btn');
         this.romInfo = document.getElementById('rom-info');
+        this.selectedRom = null;
         
         // Session elements
         this.sessionState = document.getElementById('session-state');
@@ -51,10 +53,7 @@ class PyBoyDebugger {
 
     setupEventListeners() {
         // ROM controls
-        this.loadRomBtn.addEventListener('click', () => this.loadRom());
-        this.romPath.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') this.loadRom();
-        });
+        this.refreshRomsBtn.addEventListener('click', () => this.loadRomList());
         
         // Session controls
         this.resetSessionBtn.addEventListener('click', () => this.resetSession());
@@ -233,10 +232,79 @@ class PyBoyDebugger {
         }
     }
 
-    async loadRom() {
-        const romPath = this.romPath.value.trim();
+    async loadRomList() {
+        try {
+            this.romList.innerHTML = '<div class="rom-list-loading">Loading ROMs...</div>';
+            
+            const response = await fetch('/api/roms');
+            if (!response.ok) {
+                throw new Error('Failed to fetch ROM list');
+            }
+            
+            const data = await response.json();
+            this.displayRomList(data.roms);
+            
+        } catch (error) {
+            this.log('error', `Failed to load ROM list: ${error.message}`);
+            this.romList.innerHTML = '<div class="rom-list-empty">Failed to load ROM list</div>';
+        }
+    }
+    
+    displayRomList(roms) {
+        if (roms.length === 0) {
+            this.romList.innerHTML = '<div class="rom-list-empty">No ROMs found in /roms directory</div>';
+            return;
+        }
+        
+        this.romList.innerHTML = '';
+        
+        roms.forEach(rom => {
+            const romItem = document.createElement('div');
+            romItem.className = 'rom-item';
+            romItem.dataset.path = rom.path;
+            
+            const sizeFormatted = this.formatFileSize(rom.size);
+            
+            romItem.innerHTML = `
+                <div class="rom-name">${rom.name}</div>
+                <div class="rom-details">
+                    <span class="rom-extension">${rom.extension}</span>
+                    <span class="rom-size">${sizeFormatted}</span>
+                </div>
+            `;
+            
+            romItem.addEventListener('click', () => this.selectRom(romItem, rom));
+            
+            this.romList.appendChild(romItem);
+        });
+    }
+    
+    formatFileSize(bytes) {
+        if (bytes === 0) return '0 B';
+        const k = 1024;
+        const sizes = ['B', 'KB', 'MB', 'GB'];
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
+    }
+    
+    selectRom(romItem, rom) {
+        // Remove previous selection
+        const previousSelected = this.romList.querySelector('.rom-item.selected');
+        if (previousSelected) {
+            previousSelected.classList.remove('selected');
+        }
+        
+        // Select new ROM
+        romItem.classList.add('selected');
+        this.selectedRom = rom;
+        
+        // Load the ROM
+        this.loadRom(rom.path);
+    }
+
+    async loadRom(romPath) {
         if (!romPath) {
-            this.log('error', 'Please enter a ROM path');
+            this.log('error', 'No ROM path provided');
             return;
         }
         
@@ -265,8 +333,12 @@ class PyBoyDebugger {
 
     async pressButton(button, duration = 1) {
         try {
-            const response = await fetch(`/api/button/${button}?duration=${duration}`, {
+            const response = await fetch('/api/button', {
                 method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ button: button, duration: duration }),
             });
             
             if (!response.ok) {

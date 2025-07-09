@@ -214,7 +214,9 @@ class RomData(BaseModel):
 class LoadRomResponse(BaseModel):
     success: bool
     message: str
-    rom_path: str
+    rom_name: str
+    rom_hash: str
+    session_state: str
     timestamp: float
 
 
@@ -237,6 +239,8 @@ async def api_load_rom(rom_data: RomData) -> LoadRomResponse:
         }
     )
 
+    # Add timestamp for consistency
+    result["timestamp"] = time()
     return LoadRomResponse(**result)
 
 
@@ -331,6 +335,60 @@ async def api_get_settings(settings: SettingsDep) -> dict[str, Any]:
         "update_interval": settings.update_interval,
         # Note: Don't expose sensitive settings like API keys
     }
+
+
+class RomInfo(BaseModel):
+    name: str
+    path: str
+    size: int
+    extension: str
+
+
+class RomListResponse(BaseModel):
+    roms: list[RomInfo]
+    total: int
+
+
+@app.get("/api/roms", response_model=RomListResponse)
+async def api_list_roms() -> RomListResponse:
+    """List all available ROMs in the roms directory."""
+    roms_dir = Path(__file__).parent.parent.parent / "roms"
+    roms = []
+
+    if roms_dir.exists() and roms_dir.is_dir():
+        for rom_file in roms_dir.glob("*.gb"):
+            try:
+                stat = rom_file.stat()
+                roms.append(
+                    RomInfo(
+                        name=rom_file.name,
+                        path=str(rom_file),
+                        size=stat.st_size,
+                        extension=rom_file.suffix,
+                    )
+                )
+            except Exception as e:
+                logger.warning(f"Failed to read ROM file {rom_file}: {e}")
+
+        # Also check for .gbc files
+        for rom_file in roms_dir.glob("*.gbc"):
+            try:
+                stat = rom_file.stat()
+                roms.append(
+                    RomInfo(
+                        name=rom_file.name,
+                        path=str(rom_file),
+                        size=stat.st_size,
+                        extension=rom_file.suffix,
+                    )
+                )
+            except Exception as e:
+                logger.warning(f"Failed to read ROM file {rom_file}: {e}")
+
+    # Sort by name
+    roms.sort(key=lambda x: x.name.lower())
+
+    return RomListResponse(roms=roms, total=len(roms))
 
 
 @app.get("/api/health", response_model=HealthResponse)

@@ -68,8 +68,13 @@
             <section class="rom-section">
                 <h3>ROM Management</h3>
                 <div class="rom-controls">
-                    <input type="text" id="rom-path" placeholder="Path to ROM file" value="@roms/">
-                    <button id="load-rom-btn">Load ROM</button>
+                    <div class="rom-list-container">
+                        <h4>Available ROMs</h4>
+                        <div id="rom-list" class="rom-list">
+                            <div class="rom-list-loading">Loading ROMs...</div>
+                        </div>
+                        <button id="refresh-roms-btn" class="secondary-btn">Refresh List</button>
+                    </div>
                 </div>
                 <div id="rom-info" class="info-panel">
                     <p>No ROM loaded</p>
