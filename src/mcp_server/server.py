@@ -14,7 +14,7 @@ import numpy as np
 from mcp.server.fastmcp import FastMCP
 from PIL import Image
 
-from mcp_pyboy.session import SessionError, get_session_manager
+from mcp_server.session import SessionError, get_session_manager
 
 # Configure logging
 logging.basicConfig(

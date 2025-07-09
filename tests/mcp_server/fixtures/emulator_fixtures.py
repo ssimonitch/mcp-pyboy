@@ -8,9 +8,9 @@ and synthetic ROMs for integration testing.
 from pathlib import Path
 
 import pytest
-from mcp_pyboy.emulator import PyBoyEmulator
 
-from tests.fixtures.rom_generation import (
+from mcp_server.emulator import PyBoyEmulator
+from tests.mcp_server.fixtures.rom_generation import (
     create_corrupted_rom_data,
     create_test_rom_data,
     create_test_rom_with_title,

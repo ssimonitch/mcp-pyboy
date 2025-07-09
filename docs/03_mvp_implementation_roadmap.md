@@ -54,14 +54,14 @@ This document provides a step-by-step implementation guide for building the MCP 
 
 ### Basic MCP Server Structure
 - [x] **2.1** Create MCP server using FastMCP
-  - [x] Create `src/mcp_pyboy/server.py` using FastMCP
+  - [x] Create `src/mcp_server/server.py` using FastMCP
   - [x] Set up basic server with health check tool
   - [x] Test MCP server connectivity via stdio
   - **Claude Code Tip**: "Create a basic FastMCP server with a simple health check tool to validate MCP connectivity"
 
 ### PyBoy Integration Foundation
 - [x] **2.2** Implement PyBoy wrapper class
-  - [x] Create `src/mcp_pyboy/emulator.py` with PyBoy wrapper
+  - [x] Create `src/mcp_server/emulator.py` with PyBoy wrapper
   - [x] Implement basic emulator lifecycle (start, stop, load ROM)
   - [x] Add LLM-friendly error handling for common PyBoy issues
   - **Claude Code Tip**: "Create a PyBoy wrapper that handles emulator lifecycle and provides LLM-friendly error messages"
@@ -85,7 +85,7 @@ This document provides a step-by-step implementation guide for building the MCP 
 
 ### Web Frontend for Debugging
 - [ ] **2.5** Create minimal web frontend
-  - [ ] Create simple Flask/FastAPI debug server
+  - [x] Create simple FastAPI debug server
   - [ ] Live screen display (auto-refreshing base64 image)
   - [ ] Visual button press indicators
   - [ ] Current ROM and session status display
@@ -151,7 +151,7 @@ This document provides a step-by-step implementation guide for building the MCP 
 
 ### Game-Specific Notebook Implementation
 - [ ] **4.1** Create notebook manager
-  - [ ] Implement `src/mcp_pyboy/notebook.py` with game-specific storage
+  - [ ] Implement `src/mcp_server/notebook.py` with game-specific storage
   - [ ] One notebook per ROM (identified by ROM hash)
   - [ ] Sections: Current Objectives, Progress Log, Important Discoveries, Strategy Notes
   - [ ] Auto-clear temporary notes when loading different ROM
@@ -191,7 +191,7 @@ This document provides a step-by-step implementation guide for building the MCP 
 
 ### CLI and Basic Documentation
 - [ ] **5.2** Add command-line interface
-  - [ ] Create `src/mcp_pyboy/cli.py` for easy server startup
+  - [ ] Create `src/mcp_server/cli.py` for easy server startup
   - [ ] Add configuration options and help text
   - [ ] Implement proper signal handling
   - **Claude Code Tip**: "Create a user-friendly CLI that makes it easy to start and configure the MCP server"

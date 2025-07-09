@@ -72,7 +72,7 @@ uv run mcp-pyboy --roms-dir ./roms --log-level DEBUG
 
 ```
 mcp-pyboy/
-├── src/mcp_pyboy/          # Main package
+├── src/mcp_server/          # Main package
 │   ├── mcp_server/         # MCP protocol implementation
 │   ├── game_session/       # PyBoy emulator wrapper
 │   ├── notebook/           # Knowledge persistence

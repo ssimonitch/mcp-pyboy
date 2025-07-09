@@ -8,10 +8,10 @@ tool workflow from ROM loading to screen capture and button presses.
 from pathlib import Path
 
 import pytest
-from mcp_pyboy.server import get_screen, load_rom, press_button
-from mcp_pyboy.session import get_session_manager
 
-from tests.fixtures.rom_generation import create_test_rom_data
+from mcp_server.server import get_screen, load_rom, press_button
+from mcp_server.session import get_session_manager
+from tests.mcp_server.fixtures.rom_generation import create_test_rom_data
 
 
 @pytest.fixture

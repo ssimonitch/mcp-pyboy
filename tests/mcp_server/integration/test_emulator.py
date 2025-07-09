@@ -8,13 +8,13 @@ Focuses on testing our wrapper's logic, error handling, and LLM-friendly interfa
 from pathlib import Path
 
 import pytest
-from mcp_pyboy.emulator import (
+
+from mcp_server.emulator import (
     EmulatorStateError,
     PyBoyEmulator,
     ROMError,
 )
-
-from tests.fixtures.rom_generation import create_test_rom_data
+from tests.mcp_server.fixtures.rom_generation import create_test_rom_data
 
 
 @pytest.fixture

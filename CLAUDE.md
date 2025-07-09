@@ -38,9 +38,10 @@ source .venv/bin/activate
 - Format code: `uv run format` (or `uv run black src/ tests/`)
 - Type check: `uv run typecheck` (or `uv run mypy src/`)
 - Lint code: `uv run lint` (or `uv run ruff check src/ tests/`)
-- Start MCP server: `uv run python src/mcp_pyboy/server.py`
-- Test MCP server: `uv run mcp dev src/mcp_pyboy/server.py` (development mode)
-- Install for Claude Desktop: `uv run mcp install src/mcp_pyboy/server.py --name "PyBoy Dev"`
+- Start MCP server: `uv run python src/mcp_server/server.py`
+- Test MCP server: `uv run mcp dev src/mcp_server/server.py` (development mode)
+- Install for Claude Desktop: `uv run mcp install src/mcp_server/server.py --name "PyBoy Dev"`
+- Start web API server: `uv run web-server` (or `uv run python src/web_server/app.py`)
 - Install new dependency: `uv add <package-name>`
 - Install dev dependency: `uv add --dev <package-name>`
 
@@ -66,7 +67,7 @@ source .venv/bin/activate
 
 ## Testing ROMs
 
-Test ROMs for automated testing located in `tests/fixtures/test_roms/`:
+Test ROMs for automated testing located in `tests/mcp_server/fixtures/test_roms/`:
 - Small, lightweight ROMs for unit and integration testing
 - No copyright concerns for CI/CD pipelines
 
@@ -108,13 +109,13 @@ async def example_tool(param: str) -> str:
 ### Testing MCP Tools
 ```bash
 # Test server connectivity
-uv run mcp dev src/mcp_pyboy/server.py
+uv run mcp dev src/mcp_server/server.py
 
 # Run integration tests with test ROMs
-uv run pytest tests/integration/ -v
+uv run pytest tests/mcp_server/integration/ -v
 
 # Test with Claude Desktop (install server locally)
-uv run mcp install src/mcp_pyboy/server.py --name "PyBoy Dev"
+uv run mcp install src/mcp_server/server.py --name "PyBoy Dev"
 ```
 
 ### Notebook System Guidelines

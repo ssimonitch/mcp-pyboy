@@ -30,8 +30,8 @@ from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 from pydantic_settings import BaseSettings
 
-from mcp_pyboy.server import get_screen, get_session_info, load_rom, press_button
-from mcp_pyboy.session import get_session_manager
+from mcp_server.server import get_screen, get_session_info, load_rom, press_button
+from mcp_server.session import get_session_manager
 
 
 class Settings(BaseSettings):
@@ -82,7 +82,7 @@ app.add_middleware(
 )
 
 # Get the static files directory
-STATIC_DIR = Path(__file__).parent / "static"
+STATIC_DIR = Path(__file__).parent.parent / "web_frontend"
 
 # Mount static files
 app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
@@ -375,7 +375,7 @@ def main() -> None:
     )
 
     uvicorn.run(
-        "frontend.app:app",
+        "web_server.app:app",
         host=settings.host,
         port=settings.port,
         reload=settings.reload,

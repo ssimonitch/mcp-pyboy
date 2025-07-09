@@ -55,21 +55,22 @@ test = [
 frontend = ["fastapi>=0.116.0", "uvicorn>=0.35.0"]
 
 [project.scripts]
-mcp-pyboy = "mcp_pyboy.cli:main"
-format = "mcp_pyboy.scripts.format:main"
-lint = "mcp_pyboy.scripts.lint:main"
-test = "mcp_pyboy.scripts.test:main"
-typecheck = "mcp_pyboy.scripts.typecheck:main"
+mcp-pyboy = "mcp_server.cli:main"
+format = "mcp_server.scripts.format:main"
+lint = "mcp_server.scripts.lint:main"
+test = "mcp_server.scripts.test:main"
+typecheck = "mcp_server.scripts.typecheck:main"
+web-server = "web_server.app:main"
 
 [project.urls]
-Homepage = "https://github.com/yourusername/mcp-pyboy"
-Repository = "https://github.com/yourusername/mcp-pyboy"
-Issues = "https://github.com/yourusername/mcp-pyboy/issues"
-Documentation = "https://yourusername.github.io/mcp-pyboy"
+Homepage = "https://github.com/ssimonitch/mcp-pyboy"
+Repository = "https://github.com/ssimonitch/mcp-pyboy"
+Issues = "https://github.com/ssimonitch/mcp-pyboy/issues"
+Documentation = "https://ssimonitch.github.io/mcp-pyboy"
 
 # Hatch configuration
 [tool.hatch.build.targets.wheel]
-packages = ["src/mcp_pyboy"]
+packages = ["src/mcp_server", "src/web_server", "src/web_frontend"]
 
 [tool.hatch.build.targets.sdist]
 include = ["/src", "/tests", "/docs", "/README.md", "/LICENSE"]
@@ -120,7 +121,7 @@ ignore = [
 
 # Import sorting configuration (isort compatibility)
 [tool.ruff.lint.isort]
-known-first-party = ["mcp_pyboy"]
+known-first-party = ["mcp_server", "web_server"]
 force-single-line = false
 split-on-trailing-comma = true
 combine-as-imports = true
@@ -140,7 +141,7 @@ warn_return_any = true
 strict_optional = true
 
 [[tool.mypy.overrides]]
-module = ["pyboy.*", "mcp.*"]
+module = ["pyboy.*", "mcp.*", "fastapi.*", "uvicorn.*"]
 ignore_missing_imports = true
 
 [[tool.mypy.overrides]]
@@ -155,7 +156,7 @@ minversion = "7.0"
 addopts = [
     "--strict-markers",
     "--strict-config",
-    "--cov=src/mcp_pyboy",
+    "--cov=src/mcp_server",
     "--cov-report=term-missing",
     "--cov-report=html",
     "--cov-report=xml",

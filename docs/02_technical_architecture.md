@@ -356,7 +356,7 @@ class GameState(BaseModel):
 # tests/unit/test_emulator.py
 import pytest
 from unittest.mock import Mock, patch
-from mcp_pyboy.game_session import EmulatorWrapper
+from mcp_server.game_session import EmulatorWrapper
 
 @pytest.fixture
 def mock_pyboy():
@@ -380,7 +380,7 @@ async def test_button_press(mock_pyboy):
 ```python
 # tests/integration/test_mcp_flow.py
 import pytest
-from mcp_pyboy import MCPServer
+from mcp_server import MCPServer
 
 @pytest.mark.integration
 async def test_full_game_flow():
@@ -473,7 +473,7 @@ classifiers = [
 ]
 
 [project.scripts]
-mcp-pyboy = "mcp_pyboy.cli:main"
+mcp-pyboy = "mcp_server.cli:main"
 ```
 
 ### 3. Documentation Site (GitHub Pages)
