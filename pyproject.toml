@@ -26,12 +26,13 @@ requires-python = ">=3.10"
 
 # Core Dependencies
 dependencies = [
-    "mcp>=1.0.0",       # MCP protocol implementation (includes FastMCP)
-    "pyboy>=2.0.0",     # Game Boy emulator engine
-    "pydantic>=2.0.0",  # Data validation and settings (used by FastMCP)
-    "pillow>=10.0.0",   # Image processing for screenshots
-    "numpy>=1.24.0",    # Numerical computing for screen data
+    "mcp>=1.0.0", # MCP protocol implementation (includes FastMCP)
+    "pyboy>=2.0.0", # Game Boy emulator engine
+    "pydantic>=2.0.0", # Data validation and settings (used by FastMCP)
+    "pillow>=10.0.0", # Image processing for screenshots
+    "numpy>=1.24.0", # Numerical computing for screen data
     "aiofiles>=23.0.0", # Async file operations for notebook system
+    "websockets>=15.0.1",
 ]
 
 # Optional dependencies for different features
@@ -52,7 +53,7 @@ test = [
     "pytest-mock>=3.11.0",
     "pytest-cov>=4.1.0",
 ]
-frontend = ["fastapi>=0.116.0", "uvicorn>=0.35.0"]
+frontend = ["fastapi>=0.116.0", "uvicorn>=0.35.0", "websockets>=15.0.0"]
 
 [project.scripts]
 mcp-pyboy = "mcp_server.cli:main"
